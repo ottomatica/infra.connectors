@@ -1,0 +1,25 @@
+{
+  "name": "infra.connector",
+  "version": "0.0.1",
+  "description": "Common library of connectors in Ottomatica tool chains, to allow communication with different infrastructure",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "ottomatica",
+    "infrastructure"
+  ],
+  "author": "Ottomatica",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "chalk": "^2.4.2",
+    "check-disk-space": "^1.5.0",
+    "dockerode": "^2.5.8",
+    "fs-extra": "^8.0.1",
+    "js-yaml": "^3.13.1",
+    "request": "^2.88.0",
+    "ssh2": "^0.8.4",
+    "systeminformation": "^4.4.1"
+  }
+}
