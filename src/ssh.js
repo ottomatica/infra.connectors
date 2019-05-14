@@ -6,11 +6,11 @@ class SSHConnector {
     constructor(userHost, private_key) {
         let userHostSplit = userHost.split(/[@:]+/);
         // TODO: better validation
-        if (userHostSplit.length < 2) { throw new Error('Couldn\'t parse provided host information. Correct format is \'user@hostname:port\''); }
+        if (userHostSplit.length < 2) { throw new Error(`Couldn't parse provided host information. Correct format is 'user@hostname:port'`); }
         this.sshConfig = {
             user: userHostSplit[0],
             hostname: userHostSplit[1],
-            port: userHostSplit[2] ? userHostSplit[2] : 22,
+            port: userHostSplit[2] || 22,
             private_key,
         };
     }
@@ -52,11 +52,11 @@ class SSHConnector {
         }
     }
 
-    async exec(context, cmd) {
+    async exec(cmd) {
         return this._JSSSHExec(cmd, this.sshConfig);
     }
 
-    async _JSSSHExec(cmd, sshConfig, timeout = 5000, verbose = false, options = { count: 20 }) {
+    async _JSSSHExec(cmd, sshConfig, timeout = 20000, verbose = false, options = { count: 20 }) {
         let buffer = '';
         return new Promise((resolve, reject) => {
             let c = new Client();
