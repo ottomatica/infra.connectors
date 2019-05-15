@@ -3,7 +3,6 @@ const fs = require('fs-extra');
 const os = require('os');
 const si = require('systeminformation');
 const checkDiskSpace = require('check-disk-space');
-const Utils = require('../utils/utils');
 const request = require('request');
 
 
@@ -96,12 +95,12 @@ class LocalConnector {
     }
 
     async pathExists(destPath, context) {
-        return fs.pathExists(Utils.resolvePath(destPath));
+        return fs.pathExists(this.resolvePath(destPath));
     }
 
     async contains(context, file, string, expect) {
         if (await this.pathExists(file)) {
-            return expect === (await fs.readFile(Utils.resolvePath(file))).includes(string);
+            return expect === (await fs.readFile(this.resolvePath(file))).includes(string);
         }
         throw Error('file doesn\'t exist');
     }
@@ -136,6 +135,12 @@ class LocalConnector {
 
     async getDiskSpace(_context, diskLocation) {
         return Math.floor((await checkDiskSpace(diskLocation)).free / 1024000000);
+    }
+
+    resolvePath(destPath) {
+        if (!destPath) return destPath;
+        if (destPath.slice(0, 2) !== '~/') return path.resolve(destPath);
+        return path.resolve(path.join(os.homedir(), destPath.slice(2)));
     }
 }
 
