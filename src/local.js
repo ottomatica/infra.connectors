@@ -4,6 +4,7 @@ const os = require('os');
 const si = require('systeminformation');
 const checkDiskSpace = require('check-disk-space');
 const request = require('request');
+const path = require('path');
 
 
 class LocalConnector {
