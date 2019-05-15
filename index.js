@@ -8,31 +8,25 @@ const SlimConnector = require('./src/slim');
 
 class Connector {
 
-    constructor(type, name) {
+    static getConnector(type, name) {
         switch (type) {
             case 'local':
-                this.connector = new LocalConnector();
-                break;
+                return new LocalConnector();
 
             case 'slim':
-                this.connector = new SlimConnector(name);
-                break;
+                return new SlimConnector(name);
 
             case 'vagrant':
-                this.connector = new VagrantConnector();
-                break;
+                return new VagrantConnector();
 
             case 'baker': 
-                this.connector = new BakerConnector();
-                break;
+                return new BakerConnector();
 
             case 'ssh':
-                this.connector = new SSHConnector();
-                break;
+                return new SSHConnector();
 
             case 'docker':
-                this.connector = new DockerConnector();
-                break;
+                return new DockerConnector();
 
             default:
                 break;
