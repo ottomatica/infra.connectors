@@ -46,6 +46,12 @@ class SlimConnector extends SshConnector {
         child_process.execSync(`slim run ${name} ${imagePath}`, {stdio:"inherit"});
     }
 
+    async isImageAvailable(image)
+    {
+        let output = child_process.execSync(`slim images`);
+        return output.contains(image);
+    }
+
 
     async ready() {
         this.sshConfig = await this.getSSHConfig();
