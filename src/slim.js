@@ -43,7 +43,7 @@ class SlimConnector extends SshConnector {
 
     async provision(imagePath)
     {
-        child.execSync(`slim run phpx ${imagePath}}`, {stdio:"inherit"});
+        child_process.execSync(`slim run phpx ${imagePath}}`, {stdio:"inherit"});
     }
 
 
