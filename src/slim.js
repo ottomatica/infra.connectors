@@ -31,6 +31,22 @@ class SlimConnector extends SshConnector {
         };
     }
 
+    async build(file)
+    {
+        child_process.execSync(`slim build ${file}`, {stdio:"inherit"});
+    }
+
+    async delete(name)
+    {
+        child_process.execSync(`slim delete vm ${name}`, {stdio:"inherit"});
+    }
+
+    async provision(imagePath)
+    {
+        child.execSync(`slim run phpx ${imagePath}}`, {stdio:"inherit"});
+    }
+
+
     async ready() {
         this.sshConfig = await this.getSSHConfig();
         return super.ready();
