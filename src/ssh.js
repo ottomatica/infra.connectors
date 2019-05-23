@@ -24,8 +24,22 @@ class SSHConnector {
     }
 
     async ready() {
-        await this._JSSSHExec('ls', this.sshConfig, 20000, false, { count: 5 });
-        return true;
+        new Promise((resolve, reject) => {
+            for (let c = 0; c < 5; c++) {
+                var conn = new Client();
+                conn.on('ready', function () {
+                    console.log('Client :: ready');
+                    resolve('true');
+                }).on('error', function (err) {
+                }).connect({
+                    host: this.sshConfig.hostname,
+                    port: this.sshConfig.port,
+                    username: this.sshConfig.user,
+                    privateKey: fs.readFileSync(this.sshConfig.private_key),
+                    readyTimeout: 20000,
+                });
+            }
+        });
     }
 
     async setup(context, setup) {
