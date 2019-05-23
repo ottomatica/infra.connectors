@@ -21,6 +21,10 @@ class LocalConnector {
         return true;
     }
 
+    async getState(VMName) {
+        return "running";
+    }
+
     async setup(context, setup) {
         return new Promise(((resolve, reject) => {
             if (setup && setup.cmd) {
