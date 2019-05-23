@@ -31,6 +31,11 @@ class SlimConnector extends SshConnector {
         };
     }
 
+    async ready() {
+        this.sshConfig = await this.getSSHConfig();
+        return super.ready();
+    }
+
     async _VBoxProvider_info() {
         return new Promise(((resolve, reject) => {
             child_process.exec(`${VBexe} showvminfo ${this.VMName} --machinereadable`, (error, stdout, stderr) => {

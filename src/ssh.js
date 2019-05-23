@@ -24,7 +24,7 @@ class SSHConnector {
     }
 
     async ready() {
-        await this._JSSSHExec('ls', this.sshConfig, 5000, false, { count: 5 });
+        await this._JSSSHExec('ls', this.sshConfig, 20000, false, { count: 5 });
         return true;
     }
 
