@@ -41,9 +41,9 @@ class SlimConnector extends SshConnector {
         child_process.execSync(`slim delete vm ${name}`, {stdio:"inherit"});
     }
 
-    async provision(imagePath)
+    async provision(name, imagePath)
     {
-        child_process.execSync(`slim run phpx ${imagePath}`, {stdio:"inherit"});
+        child_process.execSync(`slim run ${name} ${imagePath}`, {stdio:"inherit"});
     }
 
 
