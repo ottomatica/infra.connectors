@@ -48,7 +48,7 @@ class SlimConnector extends SshConnector {
 
     async isImageAvailable(image)
     {
-        let output = child_process.execSync(`slim images`);
+        let output = child_process.execSync(`slim images`).toString();
         return output.contains(image);
     }
 
