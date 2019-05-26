@@ -66,8 +66,8 @@ class SSHConnector {
             {
                 cmdWithPid = `echo $$; exec cd ${options.cwd}; exec ${cmd}`;
             }
-            let options = {setup: {wait_for: ""}};
-            let data = (await this._JSSSHExec(cmdWithPid, this.sshConfig, 5000, true, options)).toString();
+            let sshOptions = {setup: {wait_for: ""}};
+            let data = (await this._JSSSHExec(cmdWithPid, this.sshConfig, 5000, true, sshOptions)).toString();
             // format will be PID\nsetup.wait_for\n
             try {
                 let pid = data.split('\n')[0];
