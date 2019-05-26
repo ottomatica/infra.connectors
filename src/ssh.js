@@ -101,6 +101,9 @@ class SSHConnector {
                         }
                         stream
                             .on('close', (code, signal) => {
+                                if (verbose) {
+                                    console.log("closing stream");
+                                }
                                 c.end();
                                 resolve(buffer);
                             })
