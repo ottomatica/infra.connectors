@@ -75,11 +75,11 @@ class LocalConnector {
     }
 
     // Execute and return pid
-    async spawn(cmd) {
+    async spawn(cmd, options) {
         return new Promise((resolve, reject) => {
-            let child = child_process.spawn(cmd, {
-                shell: true,
-            });
+            options = options || {};
+            options.shell = true;
+            let child = child_process.spawn(cmd, options);
 
             child.stderr.on('data', (error) => {
                 console.error(error);
