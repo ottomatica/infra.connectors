@@ -59,9 +59,13 @@ class SSHConnector {
     }
 
     // Execute and return pid
-    async spawn(cmd) {
+    async spawn(cmd, options) {
         return new Promise(async (resolve, reject) => {
-            const cmdWithPid = `echo $$; exec ${cmd}`;
+            let cmdWithPid = `echo $$; exec ${cmd}`;
+            if( options.cwd )
+            {
+                cmdWithPid = `echo $$; exec cd ${options.cwd}; exec ${cmd}`;
+            }
             let options = {setup: {wait_for: ""}};
             let data = (await this._JSSSHExec(cmdWithPid, this.sshConfig, 5000, true, options)).toString();
             // format will be PID\nsetup.wait_for\n
