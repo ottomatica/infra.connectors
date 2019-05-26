@@ -74,6 +74,25 @@ class LocalConnector {
         }));
     }
 
+    // Execute and return pid
+    async spawn(cmd) {
+        return new Promise((resolve, reject) => {
+            let child = child_process.spawn(cmd, {
+                shell: true,
+            });
+
+            child.stderr.on('data', (error) => {
+                console.error(error);
+                reject({ error });
+            });
+
+            // child.stdout.on('data', (data) => {
+            //     console.log(data);
+            // });
+            resolve({pid: child.pid });
+        });
+    }
+
     async resolveHost(host) {
         return false;
     }
