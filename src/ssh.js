@@ -58,6 +58,22 @@ class SSHConnector {
         }
     }
 
+    // Execute and return pid
+    async spawn(cmd) {
+        return new Promise((resolve, reject) => {
+            const cmdWithPid = `echo $$; exec ${cmd}`;
+            let data = (await this._JSSSHExec(cmdWithPid, this.sshConfig, 5000, false, {})).toString();
+            // format will be PID\nsetup.wait_for\n
+            try {
+                let pid = data.split('\n')[0];
+                resolve({pid: pid });
+            } catch (err) {
+                console.error(chalk.red('\t=> Failed to run the command and store the PID'));
+                reject( {error: err} );
+            }
+        });
+    }
+
     async tearDown(pid) {
         if (pid) {
             // 'SIGINT'
