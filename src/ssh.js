@@ -64,7 +64,7 @@ class SSHConnector {
             let cmdWithPid = `echo $$; exec ${cmd}`;
             if( options.cwd )
             {
-                cmdWithPid = `echo $$; exec cd ${options.cwd}; exec ${cmd}`;
+                cmdWithPid = `echo $$; cd ${options.cwd}; exec ${cmd}`;
             }
             let sshOptions = {setup: {wait_for: ""}};
             let data = (await this._JSSSHExec(cmdWithPid, this.sshConfig, 5000, true, sshOptions)).toString();
