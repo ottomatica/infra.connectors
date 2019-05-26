@@ -67,7 +67,7 @@ class SSHConnector {
             // format will be PID\nsetup.wait_for\n
             try {
                 let pid = data.split('\n')[0];
-                resolve({pid: pid });
+                resolve({pid: pid, output: data });
             } catch (err) {
                 console.error(chalk.red('\t=> Failed to run the command and store the PID'));
                 reject( {error: err} );
