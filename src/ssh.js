@@ -58,6 +58,27 @@ class SSHConnector {
         }
     }
 
+    // Execute and return pid
+    async spawn(cmd, options) {
+        return new Promise(async (resolve, reject) => {
+            let cmdWithPid = `echo $$; exec ${cmd}`;
+            if( options.cwd )
+            {
+                cmdWithPid = `echo $$; cd ${options.cwd}; exec ${cmd}`;
+            }
+            let sshOptions = {setup: {wait_for: ""}};
+            let data = (await this._JSSSHExec(cmdWithPid, this.sshConfig, 5000, true, sshOptions)).toString();
+            // format will be PID\nsetup.wait_for\n
+            try {
+                let pid = data.split('\n')[0];
+                resolve({pid: pid, output: data });
+            } catch (err) {
+                console.error(chalk.red('\t=> Failed to run the command and store the PID'));
+                reject( {error: err} );
+            }
+        });
+    }
+
     async tearDown(pid) {
         if (pid) {
             // 'SIGINT'
@@ -84,6 +105,9 @@ class SSHConnector {
                         }
                         stream
                             .on('close', (code, signal) => {
+                                if (verbose) {
+                                    console.log("closing stream");
+                                }
                                 c.end();
                                 resolve(buffer);
                             })
