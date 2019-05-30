@@ -64,12 +64,7 @@ class LocalConnector {
     async exec(cmd) {
         return new Promise(((resolve, reject) => {
             child_process.exec(cmd, (error, stdout, stderr) => {
-                if (error || stderr) {
-                    // console.error(`=> ${error}, ${stderr}`);
-                    resolve(stderr);
-                } else {
-                    resolve(stdout);
-                }
+                resolve(stdout + stderr || '');
             });
         }));
     }
