@@ -24,22 +24,29 @@ class SSHConnector {
     }
 
     async ready() {
-        new Promise((resolve, reject) => {
-            for (let c = 0; c < 5; c++) {
-                var conn = new Client();
-                conn.on('ready', function () {
-                    console.log('Client :: ready');
-                    resolve('true');
-                }).on('error', function (err) {
-                }).connect({
-                    host: this.sshConfig.hostname,
-                    port: this.sshConfig.port,
-                    username: this.sshConfig.user,
-                    privateKey: fs.readFileSync(this.sshConfig.private_key),
-                    readyTimeout: 20000,
+        let counter = 0;
+        while (counter++ <= 5) {
+            try {
+                await new Promise((resolve, reject) => {
+                   var conn = new Client();
+                   conn.on('ready', function () {
+                       // console.log('Client :: ready');
+                       resolve(true);
+                   }).on('error', function (err) {
+                       reject(err);
+                   }).connect({
+                       host: this.sshConfig.hostname,
+                       port: this.sshConfig.port,
+                       username: this.sshConfig.user,
+                       privateKey: fs.readFileSync(this.sshConfig.private_key),
+                       readyTimeout: 20000,
+                   });
                 });
+                return;
+            } catch (e) {
+                // console.log(`ready error: ${e}`);
             }
-        });
+        }
     }
 
     async setup(context, setup) {
