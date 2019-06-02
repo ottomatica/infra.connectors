@@ -8,18 +8,18 @@ const SlimConnector = require('./src/slim');
 
 class Connector {
 
-    static getConnector(type, name) {
+    static getConnector(type, name, opts) {
         switch (type) {
             case 'local':
                 return new LocalConnector();
 
             case 'slim':
-                return new SlimConnector(name);
+                return new SlimConnector(name, opts);
 
             case 'vagrant':
                 return new VagrantConnector();
 
-            case 'baker': 
+            case 'baker':
                 return new BakerConnector();
 
             case 'ssh':

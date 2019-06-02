@@ -9,9 +9,10 @@ const VBexe = process.platform === 'win32' ? '"C:\\Program Files\\Oracle\\Virtua
 const SshConnector = require('./ssh');
 
 class SlimConnector extends SshConnector {
-    constructor(VMName) {
+    constructor(VMName, opts) {
         super(`${VMName}@ottomatica`, privateKey);
         this.VMName = VMName;
+        this.provider = opts.provider || 'virtualbox';
     }
 
     async getName() {
@@ -19,13 +20,21 @@ class SlimConnector extends SshConnector {
     }
 
     async getSSHConfig() {
-        let vmInfo = await this._VBoxProvider_info();
-        let port = null;
-        Object.keys(vmInfo).forEach((key) => {
-            if (vmInfo[key].includes('guestssh')) {
-                port = parseInt(vmInfo[key].split(',')[3]);
-            }
-        });
+        let info, port;
+        switch (this.provider) {
+            case 'kvm':
+                port = await this._KVMSSH_port(this.VMName);
+                break;
+            case 'virtualbox':
+            default:
+                info = await this._VBoxProvider_info();
+                Object.keys(info).forEach((key) => {
+                    if (info[key].includes('guestssh')) {
+                        port = parseInt(info[key].split(',')[3]);
+                    }
+                });
+                break;
+        }
         return {
             user: 'root', port, host: 'nanobox', hostname: '127.0.0.1', private_key: privateKey,
         };
@@ -33,17 +42,17 @@ class SlimConnector extends SshConnector {
 
     async build(file)
     {
-        child_process.execSync(`slim build ${file}`, {stdio:"inherit"});
+        child_process.execSync(`slim build ${file} -p ${this.provider}`, {stdio:"inherit"});
     }
 
     async delete(name)
     {
-        child_process.execSync(`slim delete vm ${name}`, {stdio:"inherit"});
+        child_process.execSync(`slim delete vm ${name} -p ${this.provider}`, {stdio:"inherit"});
     }
 
     async provision(name, imagePath)
     {
-        child_process.execSync(`slim run ${name} ${imagePath}`, {stdio:"inherit"});
+        child_process.execSync(`slim run ${name} ${imagePath} -p ${this.provider}`, {stdio:"inherit"});
     }
 
     async isImageAvailable(image)
@@ -51,7 +60,6 @@ class SlimConnector extends SshConnector {
         let output = child_process.execSync(`slim images`).toString();
         return output.indexOf(image) > -1;
     }
-
 
     async ready() {
         this.sshConfig = await this.getSSHConfig();
@@ -81,13 +89,55 @@ class SlimConnector extends SshConnector {
         }));
     }
 
+    async _KVMProvider_info(name) {
+        return new Promise((resolve, reject) => {
+            child_process.exec(`virsh -c qemu:///session dominfo ${name}`, (err, stdout, stderr) => {
+                if (err && stderr.indexOf('failed to get domain') !== -1) {
+                    resolve({ VMState: 'not_found' });
+                } else if (err) {
+                    console.error(`=> ${err}, ${stderr}`);
+                    reject(err);
+                } else {
+                    let props = {};
+                    stdout.trim()
+                        .split('\n')
+                        .map(l => l.split(':').map(e => e.trim()))
+                        .reduce((o, [k, v]) => {
+                            o[k] = v;
+                            return o;
+                        }, props);
+                    resolve(props);
+                }
+            });
+        });
+    }
+
+    async _KVMSSH_port(name) {
+        let re = /^.+hostfwd=tcp::(\d+)-:22.+$/gm;
+        let xml = child_process.execSync(`virsh -c qemu:///session dumpxml ${name}`);
+        let [, port, ] = re.exec(xml);
+
+        return port;
+    }
+
     /**
      * Returns State of a VM
      * @param {String} VMName
      */
     async getState(VMName) {
-        let vmInfo = await this._VBoxProvider_info(VMName);
-        return vmInfo.VMState.replace(/"/g, '');
+        let state, info;
+        switch (this.provider) {
+            case 'kvm':
+                info = await this._KVMProvider_info(VMName);
+                state = info.State;
+                break;
+            case 'virtualbox':
+            default:
+                info = await this._VBoxProvider_info(VMName);
+                state = info.VMState.replace(/"/g, '');
+                break;
+        }
+        return state;
     }
 
     async exec(cmd) {
