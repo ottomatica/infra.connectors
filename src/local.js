@@ -63,8 +63,12 @@ class LocalConnector {
 
     async exec(cmd) {
         return new Promise(((resolve, reject) => {
-            child_process.exec(cmd, (error, stdout, stderr) => {
-                resolve(stdout + stderr || '');
+            child_process.exec(cmd + '\n echo $?', (error, stdout, stderr) => {
+                let exitCode = Number(stdout.trim().split('\n').slice(-1)[0].replace(/s+/, ''));
+                stdout = stdout.trim().split('\n').slice(0,-1).join('\n');
+                resolve({
+                    stdout, stderr, exitCode
+                })
             });
         }));
     }

@@ -52,10 +52,10 @@ class SSHConnector {
     async setup(context, setup) {
         if (setup && setup.cmd) {
             const cmd = `echo $$; exec ${setup.cmd}`;
-            let data = (await this._JSSSHExec(cmd, this.sshConfig, 5000, false, { setup })).toString();
+            let data = await this._JSSSHExec(cmd, this.sshConfig, 5000, false, { setup })
             // format will be PID\nsetup.wait_for\n
             try {
-                let pid = data.split('\n')[0];
+                let pid = data.stdout.split('\n')[0];
                 console.log(`\tResolved wait_for condition: Stdout matches "${setup.wait_for}"`);
                 return pid;
             } catch (err) {
@@ -74,10 +74,10 @@ class SSHConnector {
                 cmdWithPid = `echo $$; cd ${options.cwd}; exec ${cmd}`;
             }
             let sshOptions = {setup: {wait_for: ""}};
-            let data = (await this._JSSSHExec(cmdWithPid, this.sshConfig, 5000, true, sshOptions)).toString();
+            let data = await this._JSSSHExec(cmdWithPid, this.sshConfig, 5000, true, sshOptions);
             // format will be PID\nsetup.wait_for\n
             try {
-                let pid = data.split('\n')[0];
+                let pid = data.stdout.split('\n')[0];
                 resolve({pid: pid, output: data });
             } catch (err) {
                 console.error(chalk.red('\t=> Failed to run the command and store the PID'));
@@ -95,11 +95,17 @@ class SSHConnector {
     }
 
     async exec(cmd) {
-        return this._JSSSHExec(cmd, this.sshConfig);
+        let result = await this._JSSSHExec(cmd + '\n echo $?', this.sshConfig);
+        let exitCode = Number(result.stdout.split('\n').slice(-1)[0].replace(/s+/, ''));
+        result.stdout = result.stdout.trim().split('\n').slice(0,-1).join('\n');
+        result = {...result, exitCode}
+        return result;
     }
 
     async _JSSSHExec(cmd, sshConfig, timeout = 20000, verbose = false, options = { count: 20 }) {
-        let buffer = '';
+        let stdout = '';
+        let stderr = '';
+
         return new Promise((resolve, reject) => {
             let c = new Client();
             const self = this;
@@ -116,24 +122,23 @@ class SSHConnector {
                                     console.log("closing stream");
                                 }
                                 c.end();
-                                resolve(buffer);
+                                resolve({stdout, stderr});
                             })
                             .on('data', (data) => {
                                 if (verbose) {
                                     process.stdout.write(data);
                                 }
-                                buffer += data;
+                                stdout += data;
                                 if (options.setup && data.includes(options.setup.wait_for)) {
                                     c.end();
-                                    resolve(buffer);
+                                    resolve({stdout, stderr});
                                 }
                             })
                             .stderr.on('data', (data) => {
                                 if (verbose) {
                                     process.stderr.write(data);
                                 }
-                                // We add stderr to same output.
-                                buffer += data;
+                                stderr += data;
                             });
                     });
                 }).on('error', (err) => {
