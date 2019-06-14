@@ -10,7 +10,7 @@ const SshConnector = require('./ssh');
 
 class SlimConnector extends SshConnector {
     constructor(VMName, opts) {
-        super(`${VMName}@ottomatica`, privateKey);
+        super(`root@ottomatica`, privateKey);
         this.VMName = VMName;
         this.provider = opts.provider || 'virtualbox';
     }
