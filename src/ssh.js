@@ -96,8 +96,8 @@ class SSHConnector {
 
     async exec(cmd) {
         let result = await this._JSSSHExec(cmd + '\n echo $?', this.sshConfig);
-        let exitCode = Number(result.stdout.split('\n').slice(-1)[0].replace(/s+/, ''));
-        result.stdout = result.stdout.trim().split('\n').slice(0,-1).join('\n');
+        let exitCode = Number(result.stdout.trimRight().split('\n').slice(-1)[0].replace(/s+/, ''));
+        result.stdout = result.stdout.trimRight().split('\n').slice(0,-1).join('\n');
         result = {...result, exitCode}
         return result;
     }
