@@ -102,6 +102,31 @@ class SSHConnector {
         return result;
     }
 
+    /**
+     * Execute commands in an interactive shell
+     * @param {string} cmd command to run
+     * @param {string} id optionally give the session an id
+     * @param {number} timeout kill the session after x seconds (use false to disable 10m default)
+     */
+    async execPersistent(cmd, id = process.pid, timeout = 600) {
+        // ensure screen exists
+        await this._JSSSHExec(`screen -list | grep "${id}" || screen -dmS ${id}`, this.sshConfig);
+        if (timeout) this._JSSSHExec(`screen -list | grep "${id}" && (sleep ${timeout}; screen -S ${id} -X quit)`, this.sshConfig);
+
+        cmd = `
+            screen -S ${id} -X stuff '${cmd.replace("'", "\'").replace('$', '\\$')} >/tmp/cmd.stdout 2>/tmp/cmd.stderr\n'
+            screen -S ${id} -X stuff 'echo $? >> /tmp/cmd.stdout\n'
+            cat /tmp/cmd.stderr > /dev/stderr
+            cat /tmp/cmd.stdout > /dev/stdout`;
+
+        let result = await this._JSSSHExec(cmd, this.sshConfig)
+
+        let exitCode = Number(result.stdout.trimRight().split('\n').slice(-1)[0].replace(/s+/, ''));
+        result.stdout = result.stdout.trimRight().split('\n').slice(0, -1).join('\n');
+        result = { ...result, exitCode }
+        return result;
+    }
+
     async _JSSSHExec(cmd, sshConfig, timeout = 20000, verbose = false, options = { count: 20 }) {
         let stdout = '';
         let stderr = '';
