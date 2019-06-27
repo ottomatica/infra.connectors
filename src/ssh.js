@@ -110,12 +110,12 @@ class SSHConnector {
      */
     async execPersistent(cmd, id = process.pid, timeout = 600) {
         // ensure screen exists
-        await this._JSSSHExec(`screen -list | grep "${id}" || screen -dmS ${id}`, this.sshConfig);
-        if (timeout) this._JSSSHExec(`screen -list | grep "${id}" && (sleep ${timeout}; screen -S ${id} -X quit)`, this.sshConfig);
+        await this._JSSSHExec(`tmux ls | grep "${id}" || tmux new -s ${id} -d`, this.sshConfig);
+        if (timeout) this._JSSSHExec(`tmux ls | grep "${id}" && (sleep ${timeout}; tmux kill-session -t ${id})`, this.sshConfig);
 
         cmd = `
-            screen -S ${id} -X stuff '${cmd.replace("'", "\'").replace('$', '\\$')} >/tmp/cmd.stdout 2>/tmp/cmd.stderr\n'
-            screen -S ${id} -X stuff 'echo $? >> /tmp/cmd.stdout\n'
+            tmux send-keys -t ${id} '${cmd} >/tmp/cmd.stdout 2>/tmp/cmd.stderr' C-m
+            tmux send-keys -t ${id} 'echo $? >> /tmp/cmd.stdout' C-m
             cat /tmp/cmd.stderr > /dev/stderr
             cat /tmp/cmd.stdout > /dev/stdout`;
 
