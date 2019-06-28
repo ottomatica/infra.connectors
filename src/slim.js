@@ -145,9 +145,9 @@ class SlimConnector extends SshConnector {
         return super.exec(cmd);
     }
 
-    async execPersistent(cmd) {
+    async execPersistent(cmd, id = process.pid, timeout = 600) {
         this.sshConfig = await this.getSSHConfig();
-        return super.execPersistent(cmd);
+        return super.execPersistent(cmd, id, timeout);
     }
 }
 
