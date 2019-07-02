@@ -50,9 +50,12 @@ class SlimConnector extends SshConnector {
         child_process.execSync(`slim delete vm ${name} -p ${this.provider}`, {stdio:"inherit"});
     }
 
-    async provision(name, imagePath)
+    async provision(name, imagePath, options)
     {
-        child_process.execSync(`slim run ${name} ${imagePath} -p ${this.provider}`, {stdio:"inherit"});
+        let memory = options.memory ? `--memory={options.memory}` : "";
+        let cpus = options.cpus ? `--cpus={options.cpus}` : "";
+        
+        child_process.execSync(`slim run ${name} ${imagePath} -p ${this.provider} ${memory} ${cpus}`, {stdio:"inherit"});
     }
 
     async isImageAvailable(image)
