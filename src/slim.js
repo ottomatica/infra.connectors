@@ -52,8 +52,8 @@ class SlimConnector extends SshConnector {
 
     async provision(name, imagePath, options)
     {
-        let memory = options.memory ? `--memory={options.memory}` : "";
-        let cpus = options.cpus ? `--cpus={options.cpus}` : "";
+        let memory = options.memory ? `--memory=${options.memory}` : "";
+        let cpus = options.cpus ? `--cpus=${options.cpus}` : "";
         
         child_process.execSync(`slim run ${name} ${imagePath} -p ${this.provider} ${memory} ${cpus}`, {stdio:"inherit"});
     }
