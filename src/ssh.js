@@ -127,7 +127,7 @@ class SSHConnector {
         return result;
     }
 
-    async _JSSSHExec(cmd, sshConfig, timeout = 20000, verbose = false, options = { count: 20 }) {
+    async _JSSSHExec(cmd, sshConfig, timeout = 5000, verbose = false, options = { count: 20 }) {
         let stdout = '';
         let stderr = '';
 
@@ -173,19 +173,15 @@ class SSHConnector {
                             });
                     });
             }).on('error', (err) => {
-                    if (options.count === 0) {
-                        console.error(chalk.red(' => Host is not ready'));
-                        return process.exit(1);
-                    } else {
-                        options.count -= 1;
-                    }
 
-                    if (err.message.indexOf('ECONNREFUSED') > 0) {
-                        // Give vm 5 more seconds to get ready
-                        console.log(`Waiting 5 seconds for ${sshConfig.hostname}:${sshConfig.port} to be ready`);
+                    console.error(err.message);
+
+                    if (err.message.indexOf('ECONNRESET') >= 0 || err.message.indexOf('ECONNREFUSED') >= 0 || err.message.indexOf('Timed out while waiting for handshake') >= 0) {
+                        // Give vm 1 more seconds to get ready
+                        console.error(`Waiting 1 second for ${sshConfig.hostname}:${sshConfig.port} to be ready`);
                         setTimeout(async () => {
                             resolve(await self._JSSSHExec(cmd, sshConfig, timeout, verbose, options));
-                        }, timeout);
+                        }, 1000);
                     } else {
                         reject(err);
                     }
