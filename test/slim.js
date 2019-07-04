@@ -12,7 +12,7 @@ describe('Slim connector test', async function () {
     const connector = new SlimConnector(testVMName, {});
     before('Starting a slim vm to test connector', async function(){
         this.timeout(120000);
-        if( !connector.isImageAvailable('alpine3.9-infra-slim-test') )
+        if( ! await connector.isImageAvailable('alpine3.9-infra-slim-test') )
         {
             child_process.execSync(`slim build test/resources/alpine3.9-infra-slim-test`);
         }
