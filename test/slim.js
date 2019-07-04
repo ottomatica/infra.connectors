@@ -8,17 +8,26 @@ describe('hooks', function() {
 });
 
 describe('Slim connector test', async function () {
-    
+ 
+    const connector = new SlimConnector(testVMName, {});
     before('Starting a slim vm to test connector', async function(){
-        this.timeout(60000);
-        child_process.execSync(`slim run ${testVMName} alpine3.8-simple`);
+        this.timeout(120000);
+        if( !connector.isImageAvailable('alpine3.9-infra-slim-test') )
+        {
+            child_process.execSync(`slim build test/resources/alpine3.9-infra-slim-test`);
+        }
+        child_process.execSync(`slim run ${testVMName} alpine3.9-infra-slim-test`);
     });
     
     it('Run simple commands in a Slim VM', async function () {
         this.timeout(60000);
-        const connector = new SlimConnector(testVMName);
+ 
+        // console.log( await connector.getSSHConfig() );
+
         let output = await connector.exec('touch helloworld && ls helloworld');
-        assert.equal(output, 'helloworld\n');
+        assert.equal(output.stdout, 'helloworld');
+        assert.equal(output.exitCode, 0);
+        assert.equal(output.stderr, '');
     });
     
     after('Delete the test vm', function () {

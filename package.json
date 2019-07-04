@@ -4,7 +4,7 @@
   "description": "Common library of connectors in Ottomatica tool chains, to allow communication with different infrastructure",
   "main": "index.js",
   "scripts": {
-    "test": "mocha test/slim.js"
+    "test": "mocha test"
   },
   "keywords": [
     "ottomatica",

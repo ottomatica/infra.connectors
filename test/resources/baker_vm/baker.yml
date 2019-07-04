@@ -1,0 +1,3 @@
+name: virtcrud-baker-test-vm
+vm:
+  ip: 172.16.19.84

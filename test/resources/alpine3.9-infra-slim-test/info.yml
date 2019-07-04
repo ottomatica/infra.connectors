@@ -1,0 +1,6 @@
+    
+description: A simple server for testing virtcrud library and slim connetor.
+base_repository: https://github.com/ottomatica/slim
+base_directory: images/alpine3.9-simple
+base_args:
+  PKGS: tmux

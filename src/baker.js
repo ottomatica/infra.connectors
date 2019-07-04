@@ -11,35 +11,37 @@ const VBexe = process.platform === 'win32' ? '"C:\\Program Files\\Oracle\\Virtua
 const SshConnector = require('./ssh');
 
 class BakerConnector extends SshConnector {
-    constructor() {
+    constructor(context) {
         super('baker@', privateKey);
         this._bakerDoc = null;
+
+        this.context = context;
     }
 
-    async getOrLoadBakerYaml(context) {
-        if (!context.bakerPath) {
+    async getOrLoadBakerYaml() {
+        if (!this.context.bakerPath) {
             throw new Error('No bakerPath provided in context object');
         }
         if (!this._bakerDoc) {
-            this._bakerDoc = yaml.safeLoad(await fs.readFile(path.join(context.bakerPath, 'baker.yml'), 'utf8'));
+            this._bakerDoc = yaml.safeLoad(await fs.readFile(path.join(this.context.bakerPath, 'baker.yml'), 'utf8'));
         }
         return this._bakerDoc;
     }
 
-    async getName(context) {
-        let doc = await this.getOrLoadBakerYaml(context);
+    async getName() {
+        let doc = await this.getOrLoadBakerYaml(this.context);
         if (doc && doc.name) {
             return doc.name;
         }
-        throw new Error(`No name defined in baker file in ${context.bakerPath}`);
+        throw new Error(`No name defined in baker file in ${this.context.bakerPath}`);
     }
 
-    async getContainerIp(context) {
-        let doc = await this.getOrLoadBakerYaml(context);
+    async getContainerIp() {
+        let doc = await this.getOrLoadBakerYaml(this.context);
         if (doc.vm && doc.vm.ip) {
             return doc.vm.ip;
         }
-        throw new Error(`No ip defined in baker file in ${context.bakerPath}`);
+        throw new Error(`No ip defined in baker file in ${this.context.bakerPath}`);
     }
 
     async getSSHConfig(machine, _nodeName) {
@@ -87,11 +89,11 @@ class BakerConnector extends SshConnector {
         return vmInfo.VMState.replace(/"/g, '');
     }
 
-    async setup(context, setup) {
+    async setup(setup) {
         return new Promise(((resolve, reject) => {
             if (setup && setup.cmd) {
                 console.log(`\tSetup: ${setup.cmd}`);
-                let child = child_process.spawn(`cd ${context.bakerPath} && ${setup.cmd}`, { shell: true });
+                let child = child_process.spawn(`cd ${this.context.bakerPath} && ${setup.cmd}`, { shell: true });
 
                 child.stderr.on('data', (error) => {
                     console.error(error);
@@ -110,8 +112,8 @@ class BakerConnector extends SshConnector {
         }));
     }
 
-    async ready(context) {
-        const name = await this.getName(context);
+    async ready() {
+        const name = await this.getName(this.context);
         const state = await this.getState(name);
 
         if (state !== 'running') throw Error(`Baker environment is not running or doesn't exist: ${name}`);
@@ -127,11 +129,10 @@ class BakerConnector extends SshConnector {
         }
     }
 
-    async exec(context, cmd) {
-        let name = await this.getName(context);
-        let config = await this.getSSHConfig(name);
-
-        return this._JSSSHExec(cmd, config);
+    async exec(cmd) {
+        let name = await this.getName(this.context);
+        this.sshConfig = await this.getSSHConfig(name);
+        return super.exec(cmd);
     }
 }
 
