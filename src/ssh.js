@@ -134,8 +134,14 @@ class SSHConnector {
         return new Promise((resolve, reject) => {
             let c = new Client();
             const self = this;
-            c
-                .on('ready', () => {
+            c.on('keyboard-interactive', (name, instructions, lang, prompts, finish) => {
+                // iterate prompts, and figure out the answers - for OSX there should only be one prompt
+                // with the prompt value being "Password:"
+                //finish(['my-password']);
+                console.log( `${name}` `${prompts}`);
+                throw new Error(`Received unexpected keyboard prompt when connecting: ${instructions}`);
+            })
+            .on('ready', () => {
                     c.exec(cmd, options, (err, stream) => {
                         if (err) {
                             console.error(err);
@@ -166,7 +172,7 @@ class SSHConnector {
                                 stderr += data;
                             });
                     });
-                }).on('error', (err) => {
+            }).on('error', (err) => {
                     if (options.count === 0) {
                         console.error(chalk.red(' => Host is not ready'));
                         return process.exit(1);
@@ -183,14 +189,15 @@ class SSHConnector {
                     } else {
                         reject(err);
                     }
-                })
-                .connect({
-                    host: sshConfig.hostname,
-                    port: sshConfig.port,
-                    username: sshConfig.user,
-                    privateKey: fs.readFileSync(sshConfig.private_key),
-                    readyTimeout: timeout,
-                });
+            })
+            .connect({
+                host: sshConfig.hostname,
+                port: sshConfig.port,
+                username: sshConfig.user,
+                privateKey: fs.readFileSync(sshConfig.private_key),
+                readyTimeout: timeout,
+                tryKeyboard: true
+            });
         });
     }
 
