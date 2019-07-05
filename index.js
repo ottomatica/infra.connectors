@@ -20,7 +20,7 @@ class Connector {
                 return new VagrantConnector();
 
             case 'baker':
-                return new BakerConnector();
+                return new BakerConnector({bakerPath: name});
 
             case 'ssh':
                 return new SSHConnector();

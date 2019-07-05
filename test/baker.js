@@ -1,7 +1,6 @@
 const child_process = require('child_process');
 const assert = require('assert');
-const BakerConnector = require('../src/baker');
-const testVMName = 'infra_slimconnector_test';
+const Connector = require('../index');
 
 describe('hooks', function() {
     
@@ -9,7 +8,7 @@ describe('hooks', function() {
 
 describe('Baker connector test', async function () {
     
-    let connector = new BakerConnector({bakerPath: 'test/resources/baker_vm/' });
+    let connector = Connector.getConnector('baker','test/resources/baker_vm/', {});
 
     before('Starting a baker vm to test connector', async function(){
         this.timeout(120000);
