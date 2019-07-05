@@ -77,7 +77,7 @@ class LocalConnector {
 
     async exec(cmd) {
         return new Promise(((resolve, reject) => {
-            child_process.exec(`cd ${this.cwd} && ${cmd}` + '\n echo $?', (error, stdout, stderr) => {
+            child_process.exec(`${cmd}` + '\n echo $?', {cwd: this.cwd}, (error, stdout, stderr) => {
                 let exitCode = Number(stdout.trim().split('\n').slice(-1)[0].replace(/s+/, ''));
                 stdout = stdout.trim().split('\n').slice(0,-1).join('\n');
                 resolve({
