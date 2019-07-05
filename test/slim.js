@@ -1,6 +1,6 @@
 const child_process = require('child_process');
 const assert = require('assert');
-const SlimConnector = require('../src/slim');
+const Connector = require('../index');
 const testVMName = 'infra_slimconnector_test';
 
 describe('hooks', function() {
@@ -8,8 +8,9 @@ describe('hooks', function() {
 });
 
 describe('Slim connector test', async function () {
- 
-    const connector = new SlimConnector(testVMName, {});
+
+    const connector = Connector.getConnector('slim', testVMName, {});
+
     before('Starting a slim vm to test connector', async function(){
         this.timeout(120000);
         if( ! await connector.isImageAvailable('alpine3.9-infra-slim-test') )
