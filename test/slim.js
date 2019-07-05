@@ -14,9 +14,9 @@ describe('Slim connector test', async function () {
         this.timeout(120000);
         if( ! await connector.isImageAvailable('alpine3.9-infra-slim-test') )
         {
-            child_process.execSync(`slim build test/resources/alpine3.9-infra-slim-test`);
+            await connector.build(path.resolve('test/resources/alpine3.9-infra-slim-test'));
         }
-        child_process.execSync(`slim run ${testVMName} alpine3.9-infra-slim-test`);
+        await connector.provision(testVMName, 'alpine3.9-infra-slim-test');
     });
     
     it('Run simple commands in a Slim VM', async function () {
@@ -30,9 +30,8 @@ describe('Slim connector test', async function () {
         assert.equal(output.stderr, '');
     });
     
-    after('Delete the test vm', function () {
+    after('Delete the test vm', async function () {
         this.timeout(60000);
-        child_process.execSync(`VBoxManage controlvm ${testVMName} poweroff soft`, {stdio: ['ignore', 'ignore', 'ignore']});
-        child_process.execSync(`VBoxManage unregistervm ${testVMName} --delete`, {stdio: ['ignore', 'ignore', 'ignore']});
+        await connector.delete(testVMName);
     })
 });

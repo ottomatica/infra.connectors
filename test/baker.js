@@ -1,7 +1,6 @@
 const child_process = require('child_process');
 const assert = require('assert');
 const BakerConnector = require('../src/baker');
-const testVMName = 'infra_slimconnector_test';
 
 describe('hooks', function() {
     
