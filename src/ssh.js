@@ -13,6 +13,15 @@ class SSHConnector {
             port: userHostSplit[2] || 22,
             private_key,
         };
+        this.cwd = '.';
+    }
+
+    setCWD(cwd){
+        this.cwd = cwd;
+    }
+
+    getCWD(){
+        return this.cwd;
     }
 
     async getName(context) {
@@ -95,7 +104,7 @@ class SSHConnector {
     }
 
     async exec(cmd) {
-        let result = await this._JSSSHExec(cmd + '\n echo $?', this.sshConfig);
+        let result = await this._JSSSHExec(`cd ${this.cwd} && ${cmd}` + '\n echo $?', this.sshConfig);
         let exitCode = Number(result.stdout.trimRight().split('\n').slice(-1)[0].replace(/s+/, ''));
         result.stdout = result.stdout.trimRight().split('\n').slice(0,-1).join('\n');
         result = {...result, exitCode}

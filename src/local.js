@@ -8,6 +8,20 @@ const path = require('path');
 
 
 class LocalConnector {
+
+    constructor() 
+    {
+        this.cwd = '.';
+    }
+
+    setCWD(cwd){
+        this.cwd = cwd;
+    }
+
+    getCWD(){
+        return this.cwd;
+    }
+
     async getContainerIp() {
         return 'localhost';
     }
@@ -63,7 +77,7 @@ class LocalConnector {
 
     async exec(cmd) {
         return new Promise(((resolve, reject) => {
-            child_process.exec(cmd + '\n echo $?', (error, stdout, stderr) => {
+            child_process.exec(`cd ${this.cwd} && ${cmd}` + '\n echo $?', (error, stdout, stderr) => {
                 let exitCode = Number(stdout.trim().split('\n').slice(-1)[0].replace(/s+/, ''));
                 stdout = stdout.trim().split('\n').slice(0,-1).join('\n');
                 resolve({
@@ -78,6 +92,7 @@ class LocalConnector {
         return new Promise((resolve, reject) => {
             options = options || {};
             options.shell = true;
+            options.cwd = this.cwd;
             let child = child_process.spawn(cmd, options);
 
             child.stderr.on('data', (error) => {
