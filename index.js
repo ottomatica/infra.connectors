@@ -23,7 +23,7 @@ class Connector {
                 return new BakerConnector({bakerPath: name});
 
             case 'ssh':
-                return new SSHConnector();
+                return new SSHConnector(name, opts.privateKey);
 
             case 'docker':
                 return new DockerConnector();
