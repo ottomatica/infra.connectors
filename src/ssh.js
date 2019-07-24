@@ -104,8 +104,8 @@ class SSHConnector {
     }
 
     async exec(cmd) {
-        let result = await this._JSSSHExec(`cd ${this.cwd} && ${cmd}` + '\n echo $?', this.sshConfig);
-        let exitCode = Number(result.stdout.trimRight().split('\n').slice(-1)[0].replace(/s+/, ''));
+        let result = await this._JSSSHExec(`cd ${this.cwd} && ${cmd}` + '\n echo ${PIPESTATUS[@]}', this.sshConfig);
+        let exitCode = result.stdout.trimRight().split('\n').slice(-1)[0].split(' ').slice(1, -1).filter(e => e > 0).length == 0 ? 0 : 1;
         result.stdout = result.stdout.trimRight().split('\n').slice(0,-1).join('\n');
         result = {...result, exitCode}
         return result;
