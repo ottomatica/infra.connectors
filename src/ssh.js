@@ -32,6 +32,16 @@ class SSHConnector {
         return this.sshConfig.hostname;
     }
 
+    async getState() {
+        try {
+            await this.ready();
+            return 'ready';
+        } catch (err) {
+            console.log('err', err);
+            return 'timed out';
+        }
+    }
+
     async ready() {
         let counter = 0;
         while (counter++ <= 5) {
@@ -123,7 +133,7 @@ class SSHConnector {
         if (timeout) this._JSSSHExec(`tmux ls | grep "${id}" && (sleep ${timeout}; tmux kill-session -t ${id})`, this.sshConfig);
 
         cmd = `
-            tmux send-keys -t ${id} '${cmd} >/tmp/cmd.stdout 2>/tmp/cmd.stderr' C-m
+            tmux send-keys -t ${id} '${cmd.replace("'", "\'")} >/tmp/cmd.stdout 2>/tmp/cmd.stderr' C-m
             tmux send-keys -t ${id} 'echo $? >> /tmp/cmd.stdout' C-m
             cat /tmp/cmd.stderr > /dev/stderr
             cat /tmp/cmd.stdout > /dev/stdout`;
