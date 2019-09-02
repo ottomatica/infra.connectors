@@ -248,8 +248,12 @@ class SSHConnector {
         return contains === expect;
     }
 
-    checkVirt() {
-        return 'TODO'; // TODO: add shell command for checking virtualization.
+    async checkVirt() {
+        if(await this.exec(context, 'cat /proc/cpuinfo | grep -E -c 'svm|vmx'') == 0){
+		if(await this.exec(cd /dev/ | ls | grep -c 'kvm' == 0){
+			return false;
+		}
+	return true;
     }
 
     async getCPUCores(context) {
