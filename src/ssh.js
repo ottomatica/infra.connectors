@@ -248,7 +248,7 @@ class SSHConnector {
         return contains === expect;
     }
 
-    async checkVirt() {
+    async checkVirt(context) {
         if(await this.exec(context, "grep flags /proc/cpuinfo | grep -E -c 'lm'") != 0){
             if(await this.exec(context, "cat /proc/cpuinfo | grep -E -c 'svm|vmx'") != 0){
                 if(await this.exec(context, "cd /dev/ | ls | grep -c 'kvm'") != 0){
