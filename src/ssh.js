@@ -255,10 +255,10 @@ class SSHConnector {
 	    return false;
     }
 
-    // async getCPUCores(context) {
-    //     console.log("here");
-    //     return (await this.exec(context, 'nproc --all')).trim();
-    // }
+    async getCPUCores(context) {
+        console.log("here");
+        return (await this.exec(context, 'nproc --all')).trim();
+    }
 
     async getMemory(context) {
         return (await this.exec(context, `grep MemTotal /proc/meminfo | awk '{print $2 / 1024 / 1024}'`)).trim();
