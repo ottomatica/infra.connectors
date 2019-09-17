@@ -249,23 +249,22 @@ class SSHConnector {
     }
 
     async checkVirt(context) {
-        if(await this.exec(context, "cat /proc/cpuinfo | grep -E -c 'svm|vmx'") != 0){
+        if(await this.exec("cat /proc/cpuinfo | grep -E -c 'svm|vmx'").stdout != 0){
             return true;
         }
 	    return false;
     }
 
     async getCPUCores(context) {
-        console.log("here");
-        return (await this.exec(context, 'nproc --all')).trim();
+        return (await this.exec('nproc --all')).stdout.trim();
     }
 
     async getMemory(context) {
-        return (await this.exec(context, `grep MemTotal /proc/meminfo | awk '{print $2 / 1024 / 1024}'`)).trim();
+        return (await this.exec(`grep MemTotal /proc/meminfo | awk '{print $2 / 1024 / 1024}'`)).stdout.trim();
     }
 
     async getDiskSpace(context, diskLocation) {
-        return (await this.exec(context, `df --output=avail -h  ${diskLocation} | grep -P '\\d+.\\d+' -o`)).trim();
+        return (await this.exec(`df --output=avail -h  ${diskLocation} | grep -P '\\d+.\\d+' -o`)).stdout.trim();
     }
 }
 
