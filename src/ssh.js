@@ -44,25 +44,12 @@ class SSHConnector {
 
     async ready() {
         let counter = 0;
-        while (counter++ <= 5) {
+        while (counter++ <= 1) {
             try {
-                await new Promise((resolve, reject) => {
-                   var conn = new Client();
-                   conn.on('ready', function () {
-                       // console.log('Client :: ready');
-                       resolve(true);
-                   }).on('error', function (err) {
-                       reject(err);
-                   }).connect({
-                       host: this.sshConfig.hostname,
-                       port: this.sshConfig.port,
-                       username: this.sshConfig.user,
-                       privateKey: fs.readFileSync(this.sshConfig.private_key),
-                       readyTimeout: 20000,
-                   });
-                });
-                return;
+                await this.exec('ls');
+                return true;
             } catch (e) {
+                return false;
                 // console.log(`ready error: ${e}`);
             }
         }
@@ -109,7 +96,7 @@ class SSHConnector {
         if (pid) {
             // 'SIGINT'
             console.log('\tTearing down');
-            await this.exec('', `kill ${pid}`);
+            await this.exec('', `kill ${pid}`).stdout;
         }
     }
 
@@ -217,18 +204,21 @@ class SSHConnector {
     }
 
     async isReachable(host, context) {
-        let output = (await this.exec(context, `ping -c 3 ${host}`));
+        let output = (await this.exec(`ping -c 3 ${host}`)).stdout;
         if (!(output.includes('nknown host') || !output.includes('cannot resolve'))) {
             // Domain checks out
             return true;
         }
         // Url is reachable
         // See: https://stackoverflow.com/questions/10060098/getting-only-response-header-from-http-post-using-curl , https://stackoverflow.com/questions/47080853/show-the-final-redirect-headers-using-curl
-        return (await this.exec(context, `curl -sL -D - ${host} -o /dev/null | grep 'HTTP/1.1' | tail -1`)).includes('200 OK');
+        return (await this.exec(context, `curl -sL -D - ${host} -o /dev/null | grep 'HTTP/1.1' | tail -1`)).stdout.includes('200 OK');
     }
 
     async pathExists(path, context) {
-        return (await this.exec(context, `[ ! -e ${path} ] || echo 'file exists'`)).includes('file exists');
+        let intermediateResult = (await this.exec(`[ ! -e ${path} ] || echo 'file exists'`)).stdout;
+        if(intermediateResult !== null)
+            return (intermediateResult).includes('file exists');
+        return false;
     }
 
     async contains(context, file, string, expect = true) {
@@ -238,7 +228,7 @@ class SSHConnector {
         }
 
         try {
-            output = (await this.exec(context, `cat ${file} | grep '${string}'`));
+            output = (await this.exec(`cat ${file} | grep '${string}'`)).stdout;
         } catch (error) {
             output = error;
         }
@@ -249,7 +239,7 @@ class SSHConnector {
     }
 
     async checkVirt(context) {
-        if(await this.exec("cat /proc/cpuinfo | grep -E -c 'svm|vmx'").stdout != 0){
+        if((await this.exec("cat /proc/cpuinfo | grep -E -c 'svm|vmx'")).stdout != 0){
             return true;
         }
 	    return false;
