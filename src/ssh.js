@@ -215,10 +215,8 @@ class SSHConnector {
     }
 
     async pathExists(path, context) {
-        let intermediateResult = (await this.exec(`[ ! -e ${path} ] || echo 'file exists'`)).stdout;
-        if(intermediateResult !== null)
-            return (intermediateResult).includes('file exists');
-        return false;
+        return (await this.exec(`[ ! -e ${path} ] || echo 'file exists'`)).stdout.includes('file exists');
+        
     }
 
     async contains(context, file, string, expect = true) {
