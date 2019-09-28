@@ -1,9 +1,10 @@
 const Docker = require('dockerode');
 const stream = require('stream');
 const chalk  = require('chalk');
-
-class DockerConnector {
+const SshConnector = require('./ssh');
+class DockerConnector extends SshConnector{
     constructor(container) {
+        super('docker@', 'privateKey@');
         this.docker = new Docker({ socketPath: '/var/run/docker.sock' });
         this.containerId = container;
     }
@@ -62,6 +63,7 @@ class DockerConnector {
             let runningContainers = await this.docker.listContainers({ all: false });
             containerExists = runningContainers.filter(container => container.Id.includes(this.containerId) || container.Names.includes(`/${this.containerId}`)).length > 0;
         } catch (err) {
+            console.log('error ', err)
             console.error(chalk.red(' => Docker is not running so can\'t check for any matching containers.'));
         }
         return containerExists;
@@ -69,7 +71,7 @@ class DockerConnector {
 
     async exec(context, cmd) {
         const self = this;
-        return new Promise(((resolve, reject) => {
+        return { 'stdout': await new Promise(((resolve, reject) => {
             let options = {
                 Cmd: ['bash', '-c', cmd],
                 // Cmd: ['bash', '-c', 'echo test $VAR'],
@@ -103,7 +105,7 @@ class DockerConnector {
                     // });
                 });
             });
-        }));
+        }))};
     }
 }
 
