@@ -212,7 +212,7 @@ class SSHConnector {
         }
         // Url is reachable
         // See: https://stackoverflow.com/questions/10060098/getting-only-response-header-from-http-post-using-curl , https://stackoverflow.com/questions/47080853/show-the-final-redirect-headers-using-curl
-        return (await this.exec(context, `curl -sL -D - ${host} -o /dev/null | grep 'HTTP/1.1' | tail -1`)).stdout.includes('200 OK');
+        return (await this.exec(`curl -sL -D - ${host} -o /dev/null | grep 'HTTP/1.1' | tail -1`)).stdout.includes('200 OK');
     }
 
     async pathExists(path, context) {
