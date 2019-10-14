@@ -73,7 +73,6 @@ class SSHConnector {
 
     // Execute and return pid
     async spawn(cmd, options) {
-        console.log(cmd)
         return new Promise(async (resolve, reject) => {
             let cmdWithPid = `echo $$; exec ${cmd}`;
             if( options.cwd )

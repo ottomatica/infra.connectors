@@ -63,7 +63,6 @@ class DockerConnector extends SshConnector{
             let runningContainers = await this.docker.listContainers({ all: false });
             containerExists = runningContainers.filter(container => container.Id.includes(this.containerId) || container.Names.includes(`/${this.containerId}`)).length > 0;
         } catch (err) {
-            console.log('error ', err)
             console.error(chalk.red(' => Docker is not running so can\'t check for any matching containers.'));
         }
         return containerExists;
