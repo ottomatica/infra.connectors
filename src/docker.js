@@ -68,7 +68,7 @@ class DockerConnector extends SshConnector{
         return containerExists;
     }
 
-    async exec(context, cmd) {
+    async exec(cmd) {
         const self = this;
         return { 'stdout': await new Promise(((resolve, reject) => {
             let options = {
