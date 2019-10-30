@@ -1,9 +1,11 @@
 const fs         = require('fs-extra');
 const { Client } = require('ssh2');
 const chalk      = require('chalk');
+const Connector  = require('./connector');
 
-class SSHConnector {
+class SSHConnector extends Connector {
     constructor(userHost, private_key) {
+        super();
         let userHostSplit = userHost.split(/[@:]+/);
         // TODO: better validation
         if (userHostSplit.length < 2) { throw new Error(`Couldn't parse provided host information. Correct format is 'user@hostname:port'`); }
@@ -212,47 +214,6 @@ class SSHConnector {
         // Url is reachable
         // See: https://stackoverflow.com/questions/10060098/getting-only-response-header-from-http-post-using-curl , https://stackoverflow.com/questions/47080853/show-the-final-redirect-headers-using-curl
         return (await this.exec(`curl -sL -D - ${host} -o /dev/null | grep 'HTTP/1.1' | tail -1`)).stdout.includes('200 OK');
-    }
-
-    async pathExists(path, context) {
-        return (await this.exec(`[ ! -e ${path} ] || echo 'file exists'`)).stdout.includes('file exists');
-        
-    }
-
-    async contains(context, file, string, expect = true) {
-        let output;
-        if (!(await this.pathExists(file, context))) {
-            throw Error('file doesn\'t exist');
-        }
-
-        try {
-            output = (await this.exec(`cat ${file} | grep '${string}'`)).stdout;
-        } catch (error) {
-            output = error;
-        }
-
-        let contains = output.includes(string);
-
-        return contains === expect;
-    }
-
-    async checkVirt(context) {
-        if((await this.exec("cat /proc/cpuinfo | grep -E -c 'svm|vmx'")).stdout != 0){
-            return true;
-        }
-	    return false;
-    }
-
-    async getCPUCores(context) {
-        return (await this.exec('nproc --all')).stdout.trim();
-    }
-
-    async getMemory(context) {
-        return (await this.exec(`grep MemTotal /proc/meminfo | awk '{print $2 / 1024 / 1024}'`)).stdout.trim();
-    }
-
-    async getDiskSpace(context, diskLocation) {
-        return (await this.exec(`df --output=avail -h  ${diskLocation} | grep -P '\\d+.\\d+' -o`)).stdout.trim();
     }
 }
 

@@ -1,8 +1,9 @@
 const Docker = require('dockerode');
 const stream = require('stream');
 const chalk  = require('chalk');
-const SshConnector = require('./ssh');
-class DockerConnector extends SshConnector{
+const Connector = require('./connector');
+
+class DockerConnector extends Connector {
     constructor(container) {
         super('docker@', 'privateKey@');
         this.docker = new Docker({ socketPath: '/var/run/docker.sock' });
