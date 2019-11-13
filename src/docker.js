@@ -107,6 +107,10 @@ class DockerConnector extends Connector {
             });
         }))};
     }
+    async isReachable(host, context) {
+        //TODO
+        return "Docker";
+    }
 }
 
 // Export factory class
