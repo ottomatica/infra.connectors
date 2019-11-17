@@ -1,9 +1,11 @@
 const Docker = require('dockerode');
 const stream = require('stream');
 const chalk  = require('chalk');
+const Connector = require('./connector');
 
-class DockerConnector {
+class DockerConnector extends Connector {
     constructor(container) {
+        super('docker@', 'privateKey@');
         this.docker = new Docker({ socketPath: '/var/run/docker.sock' });
         this.containerId = container;
     }
@@ -67,9 +69,9 @@ class DockerConnector {
         return containerExists;
     }
 
-    async exec(context, cmd) {
+    async exec(cmd) {
         const self = this;
-        return new Promise(((resolve, reject) => {
+        return { 'stdout': await new Promise(((resolve, reject) => {
             let options = {
                 Cmd: ['bash', '-c', cmd],
                 // Cmd: ['bash', '-c', 'echo test $VAR'],
@@ -103,7 +105,11 @@ class DockerConnector {
                     // });
                 });
             });
-        }));
+        }))};
+    }
+    async isReachable(host, context) {
+        //TODO
+        return "Docker";
     }
 }
 

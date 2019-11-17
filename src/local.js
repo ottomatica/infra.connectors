@@ -161,6 +161,19 @@ class LocalConnector {
             } else {
                 status = false;
             }
+        } else if (os.platform() === 'linux') {
+            let output = null;
+            try {
+                output = child_process.execSync("cat /proc/cpuinfo | grep -E -c 'svm|vmx'");
+            } catch (err) { 
+                output = err.stdout.toString();
+            }
+            
+            if (output != 0) {
+                status = true;
+            } else {
+                status = false;
+            }
         }
         return status;
     }

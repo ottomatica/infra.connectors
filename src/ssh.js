@@ -1,9 +1,11 @@
 const fs         = require('fs-extra');
 const { Client } = require('ssh2');
 const chalk      = require('chalk');
+const Connector  = require('./connector');
 
-class SSHConnector {
+class SSHConnector extends Connector {
     constructor(userHost, private_key) {
+        super();
         let userHostSplit = userHost.split(/[@:]+/);
         // TODO: better validation
         if (userHostSplit.length < 2) { throw new Error(`Couldn't parse provided host information. Correct format is 'user@hostname:port'`); }
@@ -44,25 +46,12 @@ class SSHConnector {
 
     async ready() {
         let counter = 0;
-        while (counter++ <= 5) {
+        while (counter++ <= 1) {
             try {
-                await new Promise((resolve, reject) => {
-                   var conn = new Client();
-                   conn.on('ready', function () {
-                       // console.log('Client :: ready');
-                       resolve(true);
-                   }).on('error', function (err) {
-                       reject(err);
-                   }).connect({
-                       host: this.sshConfig.hostname,
-                       port: this.sshConfig.port,
-                       username: this.sshConfig.user,
-                       privateKey: fs.readFileSync(this.sshConfig.private_key),
-                       readyTimeout: 20000,
-                   });
-                });
-                return;
+                await this.exec('ls');
+                return true;
             } catch (e) {
+                return false;
                 // console.log(`ready error: ${e}`);
             }
         }
@@ -109,7 +98,7 @@ class SSHConnector {
         if (pid) {
             // 'SIGINT'
             console.log('\tTearing down');
-            await this.exec('', `kill ${pid}`);
+            await this.exec('', `kill ${pid}`).stdout;
         }
     }
 
@@ -149,7 +138,7 @@ class SSHConnector {
     async _JSSSHExec(cmd, sshConfig, timeout = 5000, verbose = false, options = { count: 20 }) {
         let stdout = '';
         let stderr = '';
-
+        
         return new Promise((resolve, reject) => {
             let c = new Client();
             const self = this;
@@ -217,54 +206,14 @@ class SSHConnector {
     }
 
     async isReachable(host, context) {
-        let output = (await this.exec(context, `ping -c 3 ${host}`));
+        let output = (await this.exec(`ping -c 3 ${host}`)).stdout;
         if (!(output.includes('nknown host') || !output.includes('cannot resolve'))) {
             // Domain checks out
             return true;
         }
         // Url is reachable
         // See: https://stackoverflow.com/questions/10060098/getting-only-response-header-from-http-post-using-curl , https://stackoverflow.com/questions/47080853/show-the-final-redirect-headers-using-curl
-        return (await this.exec(context, `curl -sL -D - ${host} -o /dev/null | grep 'HTTP/1.1' | tail -1`)).includes('200 OK');
-    }
-
-    async pathExists(path, context) {
-        return (await this.exec(context, `[ ! -e ${path} ] || echo 'file exists'`)).includes('file exists');
-    }
-
-    async contains(context, file, string, expect = true) {
-        let output;
-        if (!(await this.pathExists(file, context))) {
-            throw Error('file doesn\'t exist');
-        }
-
-        try {
-            output = (await this.exec(context, `cat ${file} | grep '${string}'`));
-        } catch (error) {
-            output = error;
-        }
-
-        let contains = output.includes(string);
-
-        return contains === expect;
-    }
-
-    async checkVirt(context) {
-        if(await this.exec(context, "cat /proc/cpuinfo | grep -E -c 'svm|vmx'") != 0){
-            return true;
-        }
-	    return false;
-    }
-
-    async getCPUCores(context) {
-        return (await this.exec(context, 'nproc --all')).trim();
-    }
-
-    async getMemory(context) {
-        return (await this.exec(context, `grep MemTotal /proc/meminfo | awk '{print $2 / 1024 / 1024}'`)).trim();
-    }
-
-    async getDiskSpace(context, diskLocation) {
-        return (await this.exec(context, `df --output=avail -h  ${diskLocation} | grep -P '\\d+.\\d+' -o`)).trim();
+        return (await this.exec(`curl -sL -D - ${host} -o /dev/null | grep 'HTTP/1.1' | tail -1`)).stdout.includes('200 OK');
     }
 }
 

@@ -89,12 +89,11 @@ class BakerConnector extends SshConnector {
         return vmInfo.VMState.replace(/"/g, '');
     }
 
-    async setup(setup) {
-        return new Promise(((resolve, reject) => {
+    async setup(context, setup) {
+        return await new Promise(((resolve, reject) => {
             if (setup && setup.cmd) {
                 console.log(`\tSetup: ${setup.cmd}`);
                 let child = child_process.spawn(`cd ${this.context.bakerPath} && ${setup.cmd}`, { shell: true });
-
                 child.stderr.on('data', (error) => {
                     console.error(error);
                     reject({ error });
@@ -102,7 +101,7 @@ class BakerConnector extends SshConnector {
 
                 child.stdout.on('data', (data) => {
                     if (setup.wait_for) {
-                        if (data.indexOf(setup.wait_for) !== -1) {
+                        if (data.toString().indexOf(setup.wait_for) !== -1) {
                             console.log(`\tResolved wait_for condition: Stdout matches "${setup.wait_for}"`);
                             resolve({ child });
                         }
@@ -115,7 +114,6 @@ class BakerConnector extends SshConnector {
     async ready() {
         const name = await this.getName(this.context);
         const state = await this.getState(name);
-
         if (state !== 'running') throw Error(`Baker environment is not running or doesn't exist: ${name}`);
     }
 

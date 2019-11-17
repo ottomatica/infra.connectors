@@ -17,7 +17,7 @@ class Connector {
                 return new SlimConnector(name, opts);
 
             case 'vagrant':
-                return new VagrantConnector();
+                return new VagrantConnector(opts.inCWD, name);
 
             case 'baker':
                 return new BakerConnector({bakerPath: name});
@@ -26,7 +26,7 @@ class Connector {
                 return new SSHConnector(name, opts.privateKey);
 
             case 'docker':
-                return new DockerConnector();
+                return new DockerConnector(name);
 
             default:
                 break;

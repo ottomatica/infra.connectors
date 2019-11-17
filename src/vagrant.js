@@ -67,7 +67,7 @@ class VagrantConnector extends SSHConnector {
         // break the output up line-by-line
         const data_lines = data.split('\n');
         // extract line that contains 'ip' substring
-        const ip_line = data_lines.find(e => e.indexOf('ip')).trim().split(/\s+/);
+        const ip_line = data_lines.find(e => e.includes('ip')).trim().split(/\s+/);
         // get index of the string that contains 'ip'
         const i = ip_line.findIndex(item => item.includes('ip'));
         // if ip:'w.x.y.z' (all one string), split by ':' and get [1], else assume [i + 1] is the address
