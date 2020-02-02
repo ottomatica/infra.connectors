@@ -1,8 +1,23 @@
 class Connector {
     constructor() { }
 
-    async pathExists(path, context) {
-        return (await this.exec(`[ ! -e ${path} ] || echo 'file exists'`)).stdout.includes('file exists');
+    /**
+     * 
+     * @param {string} path path to the file
+     * @param {string} permissions check read/write/execute permission `rwx`
+     */
+    async pathExists(path, permissions, context) {
+
+        permissions += 'e'; // always check if it exists
+        let output = '';
+
+        for (const p of ['e', 'r', 'w', 'x']) {
+            if (permissions.includes(p)) {
+                output += (await this.exec(`[ -${p} "${path}" ] || echo '!${p}'`)).stdout;
+            }
+        }
+
+        return ! output.includes('!');
     }
 
     async contains(context, file, string, expect = true) {
