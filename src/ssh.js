@@ -2,6 +2,7 @@ const fs         = require('fs-extra');
 const { Client } = require('ssh2');
 const chalk      = require('chalk');
 const Connector  = require('./connector');
+const Utils = require('./utils');
 
 class SSHConnector extends Connector {
     constructor(userHost, private_key) {
@@ -198,7 +199,7 @@ class SSHConnector extends Connector {
                 host: sshConfig.hostname,
                 port: sshConfig.port,
                 username: sshConfig.user,
-                privateKey: fs.readFileSync(sshConfig.private_key),
+                privateKey: fs.readFileSync(Utils.resolvePath(sshConfig.private_key)),
                 readyTimeout: timeout,
                 tryKeyboard: true
             });
