@@ -3,7 +3,7 @@ class Connector {
 
     async contains(context, file, string, expect = true) {
         let output;
-        if (!(await this.pathExists(file, context))) {
+        if (!(await this.pathExists(file, context)).status) {
             throw Error('file doesn\'t exist');
         }
 
@@ -16,6 +16,29 @@ class Connector {
         let contains = output.includes(string);
 
         return contains === expect;
+    }
+
+
+    // NOTE: this is from opunit and should be removed after refactoring:
+    /**
+     * 
+     * @param {string} path path to the file
+     * @param {string} permission check read/write/execute permission `rwx`
+     */
+    async pathExists(path, context, permission) {
+
+        let fileExists = !(await this.exec(`[ -e "${path}" ] || echo '!e'`)).stdout.includes('!e');
+        let actualPermission;
+        if(fileExists && permission)
+            actualPermission = (await this.exec(`stat -c '%a' ${path}`)).stdout;
+
+        let status = fileExists && permission ? actualPermission == permission : fileExists;
+
+        return {
+            status, 
+            expected: permission,
+            actual: fileExists ? actualPermission : 'Not found'
+        }
     }
 
     async checkVirt(context) {
