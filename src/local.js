@@ -12,6 +12,7 @@ class LocalConnector {
     constructor() 
     {
         this.cwd = '.';
+        this.type = 'local';
     }
 
     setCWD(cwd){

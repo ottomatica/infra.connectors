@@ -16,6 +16,7 @@ class BakerConnector extends SshConnector {
         this._bakerDoc = null;
 
         this.context = context;
+        this.type = 'baker';
     }
 
     async getOrLoadBakerYaml() {

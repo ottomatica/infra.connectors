@@ -13,6 +13,7 @@ class SlimConnector extends SshConnector {
         super(`root@ottomatica`, privateKey);
         this.VMName = VMName;
         this.provider = opts.provider || 'virtualbox';
+        this.type = 'slim';
     }
 
     async getName() {
