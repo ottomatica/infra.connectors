@@ -13,7 +13,7 @@
   "author": "Ottomatica",
   "license": "Apache-2.0",
   "dependencies": {
-    "chalk": "^2.4.2",
+    "chalk": "^3.0.0",
     "check-disk-space": "^2.1.0",
     "dockerode": "^2.5.8",
     "fs-extra": "^8.0.1",
