@@ -3,7 +3,7 @@ const fs = require('fs-extra');
 const os = require('os');
 const si = require('systeminformation');
 const checkDiskSpace = require('check-disk-space');
-const request = require('request');
+const got = require('got');
 const path = require('path');
 
 
@@ -120,18 +120,12 @@ class LocalConnector {
         {
             address = "http://" + address;
         }
-
-        return new Promise(((resolve, reject) => {
-            request(address, { timeout: 1000 }, (error, response, body) => {
-                if (!error && response.statusCode === 200) {
-                    resolve(true);
-                } else if (error && error.code) {
-                    resolve(false);
-                } else {
-                    resolve(false);
-                }
-            });
-        }));        
+ 
+        try {
+            return (await got(address, { followRedirect: true, rejectUnauthorized: false })).statusCode == 200;
+        } catch (err) {
+            return false;
+        }
     }
 
     async pathExists(destPath, context) {

@@ -17,8 +17,8 @@
     "check-disk-space": "^1.5.0",
     "dockerode": "^2.5.8",
     "fs-extra": "^8.0.1",
+    "got": "^10.5.5",
     "js-yaml": "^3.13.1",
-    "request": "^2.88.0",
     "ssh2": "^0.8.4",
     "systeminformation": "^4.4.1"
   },
