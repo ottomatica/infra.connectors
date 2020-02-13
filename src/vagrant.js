@@ -9,6 +9,7 @@ class VagrantConnector extends SSHConnector {
         super('vagrant@', 'privateKey@');
         this.inCWD = inCWD;
         this.name = name;
+        this.type = 'vagrant';
     }
 
     async getName(_context) {

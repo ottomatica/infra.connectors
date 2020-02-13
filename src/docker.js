@@ -8,6 +8,7 @@ class DockerConnector extends Connector {
         super('docker@', 'privateKey@');
         this.docker = new Docker({ socketPath: '/var/run/docker.sock' });
         this.containerId = container;
+        this.type = 'docker';
     }
 
     async pull(imageName) {

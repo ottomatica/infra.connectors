@@ -17,6 +17,7 @@ class SSHConnector extends Connector {
             private_key,
         };
         this.cwd = '.';
+        this.type = 'ssh';
     }
 
     setCWD(cwd){
