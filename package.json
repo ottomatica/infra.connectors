@@ -14,7 +14,7 @@
   "license": "Apache-2.0",
   "dependencies": {
     "chalk": "^2.4.2",
-    "check-disk-space": "^1.5.0",
+    "check-disk-space": "^2.1.0",
     "dockerode": "^2.5.8",
     "fs-extra": "^8.0.1",
     "got": "^10.5.5",
