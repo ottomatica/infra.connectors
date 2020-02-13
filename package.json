@@ -23,6 +23,6 @@
     "systeminformation": "^4.4.1"
   },
   "devDependencies": {
-    "mocha": "^6.1.4"
+    "mocha": "^7.0.1"
   }
 }
