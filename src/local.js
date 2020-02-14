@@ -77,17 +77,12 @@ class LocalConnector {
     }
 
     async exec(cmd) {
-        return new Promise(((resolve, reject) => {
-            child_process.exec(`${cmd}` + '\n echo "\n$?"', {cwd: this.cwd}, (error, stdout, stderr) => {
-                let stdoutLines = stdout.trim().split('\n');
-                let exitCode = Number(stdoutLines.slice(-1)[0].replace(/s+/, ''));
-                if(stdoutLines.slice(-2, -1) == '') stdoutLines.splice( -2 , 1 );
-                stdout = stdoutLines.slice(0,-1).join('\n');
-                resolve({
-                    stdout, stderr, exitCode
-                })
-            });
-        }));
+        const { status, stdout, stderr } = child_process.spawnSync(cmd, { shell: true, cwd: this.cwd });
+        return {
+            exitCode: status,
+            stdout: stdout.toString(),
+            stderr: stderr.toString()
+        }
     }
 
     // Execute and return pid
