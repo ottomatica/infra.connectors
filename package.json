@@ -20,7 +20,7 @@
     "got": "^10.5.7",
     "js-yaml": "^3.13.1",
     "ssh2": "^0.8.7",
-    "systeminformation": "^4.21.2"
+    "systeminformation": "^4.21.3"
   },
   "devDependencies": {
     "mocha": "^7.0.1"
