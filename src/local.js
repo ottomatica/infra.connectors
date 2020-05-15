@@ -168,6 +168,18 @@ class LocalConnector {
         return status;
     }
 
+    checkHyperV() {
+        if (os.platform() === 'win32') {
+            let output = child_process.execSync('systeminfo');
+            if (output && output.toString().includes('A hypervisor has been detected. Features required for Hyper-V will not be displayed.')) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+        return false;
+    }
+
     async getCPUCores(_context) {
         return (await si.cpu()).cores;
     }
