@@ -112,6 +112,12 @@ class SSHConnector extends Connector {
         return result;
     }
 
+    async scp(src, dest) {
+
+        let result = Utils.scp(src, dest, this.sshConfig);
+
+    }
+
     /**
      * Execute commands in an interactive shell
      * @param {string} cmd command to run
