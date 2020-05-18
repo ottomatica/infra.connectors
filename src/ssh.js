@@ -112,7 +112,7 @@ class SSHConnector extends Connector {
         return result;
     }
 
-    async scp(src, dest) {
+    scp(src, dest) {
 
         let result = Utils.scp(src, dest, this.sshConfig);
 
