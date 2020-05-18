@@ -13,8 +13,8 @@ class Utils {
     static scp(src, destFile, sshConfig) {
         let scpArgs = [];
         let port = sshConfig.port;
-        let identifyFile = fs.readFileSync(this.resolvePath(sshConfig.private_key))
-        let dest = `sshConfig.user@${sshConfig.hostname}:${destFile}`
+        let identifyFile = this.resolvePath(sshConfig.private_key);
+        let dest = `sshConfig.user@${sshConfig.hostname}:${destFile}`;
 
         scpArgs.push(`-q`);
         scpArgs.push(`-P`);
