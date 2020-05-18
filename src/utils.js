@@ -14,7 +14,7 @@ class Utils {
         let scpArgs = [];
         let port = sshConfig.port;
         let identifyFile = this.resolvePath(sshConfig.private_key);
-        let dest = `sshConfig.user@${sshConfig.hostname}:${destFile}`;
+        let dest = `${sshConfig.user}@${sshConfig.hostname}:${destFile}`;
 
         scpArgs.push(`-q`);
         scpArgs.push(`-P`);
