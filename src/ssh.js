@@ -104,8 +104,12 @@ class SSHConnector extends Connector {
         }
     }
 
-    async exec(cmd) {
-        let result = await this._JSSSHExec(`cd ${this.cwd} && ${cmd}` + ' \n echo "\n$?"', this.sshConfig);
+    async exec(cmd, verbose) {
+        if( verbose === undefined )
+        {
+            verbose = false;
+        }
+        let result = await this._JSSSHExec(`cd ${this.cwd} && ${cmd}` + ' \n echo "\n$?"', this.sshConfig, verbose=verbose);
         let exitCode = Number(result.stdout.trimRight().split('\n').slice(-1)[0].trim());
         result.stdout = result.stdout.trimRight().split('\n').slice(0,-1).join('\n').trimRight();
         result = {...result, exitCode}
