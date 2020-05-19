@@ -109,7 +109,7 @@ class SSHConnector extends Connector {
         {
             verbose = false;
         }
-        let result = await this._JSSSHExec(`cd ${this.cwd} && ${cmd}` + ' \n echo "\n$?"', this.sshConfig, verbose=verbose);
+        let result = await this._JSSSHExec(`cd ${this.cwd} && ${cmd}` + ' \n echo "\n$?"', this.sshConfig, 5000, verbose);
         let exitCode = Number(result.stdout.trimRight().split('\n').slice(-1)[0].trim());
         result.stdout = result.stdout.trimRight().split('\n').slice(0,-1).join('\n').trimRight();
         result = {...result, exitCode}
@@ -150,6 +150,8 @@ class SSHConnector extends Connector {
     async _JSSSHExec(cmd, sshConfig, timeout = 5000, verbose = false, options = { count: 20 }) {
         let stdout = '';
         let stderr = '';
+
+        console.log(verbose);
         
         return new Promise((resolve, reject) => {
             let c = new Client();
