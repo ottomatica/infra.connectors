@@ -151,8 +151,6 @@ class SSHConnector extends Connector {
         let stdout = '';
         let stderr = '';
 
-        console.log(verbose);
-        
         return new Promise((resolve, reject) => {
             let c = new Client();
             const self = this;
@@ -171,9 +169,9 @@ class SSHConnector extends Connector {
                         }
                         stream
                             .on('close', (code, signal) => {
-                                if (verbose) {
-                                    console.log("closing stream");
-                                }
+                                // if (verbose) {
+                                //     console.log("closing stream");
+                                // }
                                 c.end();
                                 resolve({stdout, stderr});
                             })
