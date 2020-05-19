@@ -122,6 +122,12 @@ class SSHConnector extends Connector {
 
     }
 
+    /// exec cmd with streaming output
+    async stream(cmd) {
+        let result = await this._JSSSHExec(`cd ${this.cwd} && ${cmd}`, this.sshConfig, 5000, true);
+        return result;
+    }
+
     /**
      * Execute commands in an interactive shell
      * @param {string} cmd command to run
@@ -177,7 +183,7 @@ class SSHConnector extends Connector {
                             })
                             .on('data', (data) => {
                                 if (verbose) {
-                                    process.stdout.write(data);
+                                    process.stdout.write(chalk.gray(data));
                                 }
                                 stdout += data;
                                 if (options.setup && data.includes(options.setup.wait_for)) {
@@ -187,7 +193,7 @@ class SSHConnector extends Connector {
                             })
                             .stderr.on('data', (data) => {
                                 if (verbose) {
-                                    process.stderr.write(data);
+                                    process.stderr.write(chalk.gray(data));
                                 }
                                 stderr += data;
                             });
