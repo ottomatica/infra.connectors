@@ -8,7 +8,7 @@ class Connector {
         }
 
         try {
-            output = (await this.exec(`cat ${file} | grep '${string}'`)).stdout;
+            output = (await this.exec(`cat ${file} | grep -- '${string}'`)).stdout;
         } catch (error) {
             output = error;
         }
@@ -27,6 +27,7 @@ class Connector {
      */
     async pathExists(path, context, permission) {
 
+        path = path.replace(/^~/, '$HOME');
         let fileExists = !(await this.exec(`[ -e "${path}" ] || echo '!e'`)).stdout.includes('!e');
         let actualPermission;
         if(fileExists && permission)
