@@ -54,7 +54,7 @@ class LocalConnector {
                 });
 
                 child.stdout.on('data', (data) => {
-                    console.log('\n\n\n\n\n', data);
+                    // console.log('\n\n\n\n\n', data);
                     if (setup.wait_for) {
                         if (data.indexOf(setup.wait_for) !== -1) {
                             console.log(`\tResolved wait_for condition: Stdout matches "${setup.wait_for}"`);
