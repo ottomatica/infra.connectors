@@ -118,7 +118,7 @@ class LocalConnector {
         }
  
         try {
-            return (await got(address, { followRedirect: true, rejectUnauthorized: false })).statusCode == 200;
+            return (await got(address, { followRedirect: true, https: { rejectUnauthorized: false } })).statusCode == 200;
         } catch (err) {
             return false;
         }
