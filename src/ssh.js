@@ -100,7 +100,7 @@ class SSHConnector extends Connector {
         if (pid) {
             // 'SIGINT'
             console.log('\tTearing down');
-            await this.exec('', `kill ${pid}`).stdout;
+            await this.exec(`kill ${pid}`).stdout;
         }
     }
 
