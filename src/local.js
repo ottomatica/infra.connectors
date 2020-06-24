@@ -80,8 +80,8 @@ class LocalConnector {
         const { status, stdout, stderr } = child_process.spawnSync(cmd, { shell: true, cwd: this.cwd });
         return {
             exitCode: status,
-            stdout: stdout.toString(),
-            stderr: stderr.toString()
+            stdout: stdout ? stdout.toString() : '',
+            stderr: stdout ? stderr.toString() : ''
         }
     }
 
