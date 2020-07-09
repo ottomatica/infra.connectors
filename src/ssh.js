@@ -153,7 +153,7 @@ class SSHConnector extends Connector {
         return result;
     }
 
-    async _JSSSHExec(cmd, sshConfig, timeout = 5000, verbose = false, options = { count: 20, pty: true, x11: true }) {
+    async _JSSSHExec(cmd, sshConfig, timeout = 5000, verbose = false, options = { count: 20, pty: false, x11: true }) {
         let stdout = '';
         let stderr = '';
 
