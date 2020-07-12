@@ -76,6 +76,12 @@ class LocalConnector {
         }
     }
 
+    async cp(src, dest) {
+        return fs.promises.copyFile(src, dest);
+    }
+
+    scp = this.cp;
+
     async exec(cmd) {
         const { status, stdout, stderr } = child_process.spawnSync(cmd, { shell: true, cwd: this.cwd });
         return {
