@@ -109,10 +109,10 @@ class SSHConnector extends Connector {
         {
             verbose = false;
         }
-        let result = await this._JSSSHExec(`cd ${this.cwd} && ${cmd}` + ' \n echo "\n$?"', this.sshConfig, 5000, verbose);
-        let exitCode = Number(result.stdout.trimRight().split('\n').slice(-1)[0].trim());
-        result.stdout = result.stdout.trimRight().split('\n').slice(0,-1).join('\n').trimRight();
-        result = {...result, exitCode}
+        let result = await this._JSSSHExec(`cd ${this.cwd} && ${cmd}`, this.sshConfig, 5000, verbose);
+        // let exitCode = Number(result.stdout.trimRight().split('\n').slice(-1)[0].trim());
+        // result.stdout = result.stdout.trimRight().split('\n').slice(0,-1).join('\n').trimRight();
+        // result = {...result, exitCode}
         return result;
     }
 
@@ -137,7 +137,7 @@ class SSHConnector extends Connector {
     async execPersistent(cmd, id = process.pid, timeout = 600) {
         // ensure screen exists
         await this._JSSSHExec(`tmux ls | grep "${id}" || tmux new -s ${id} -d`, this.sshConfig);
-        if (timeout) this._JSSSHExec(`tmux ls | grep "${id}" && (sleep ${timeout}; tmux kill-session -t ${id})`, this.sshConfig);
+        if (timeout) await this._JSSSHExec(`tmux ls | grep "${id}" && (sleep ${timeout}; tmux kill-session -t ${id})`, this.sshConfig);
 
         cmd = `
             tmux send-keys -t ${id} '${cmd.replace("'", "\'")} >/tmp/cmd.stdout 2>/tmp/cmd.stderr' C-m
@@ -147,13 +147,14 @@ class SSHConnector extends Connector {
 
         let result = await this._JSSSHExec(cmd, this.sshConfig)
 
-        let exitCode = Number(result.stdout.trimRight().split('\n').slice(-1)[0].replace(/s+/, ''));
-        result.stdout = result.stdout.trimRight().split('\n').slice(0, -1).join('\n');
-        result = { ...result, exitCode }
+        // let exitCode = Number(result.stdout.trimRight().split('\n').slice(-1)[0].replace(/s+/, ''));
+        // result.stdout = result.stdout.trimRight().split('\n').slice(0, -1).join('\n');
+        // result = { ...result, exitCode }
         return result;
     }
 
-    async _JSSSHExec(cmd, sshConfig, timeout = 5000, verbose = false, options = { count: 20 }) {
+    async _JSSSHExec(cmd, sshConfig, timeout = 5000, verbose = false, options = { count: 20, pty: false, x11: true, pipefail: true }) {
+        if (options.pipefail) cmd = 'set -o pipefail; ' + cmd;
         let stdout = '';
         let stderr = '';
 
@@ -174,12 +175,12 @@ class SSHConnector extends Connector {
                             reject(err);
                         }
                         stream
-                            .on('close', (code, signal) => {
+                            .on('close', (exitCode, signal) => {
                                 // if (verbose) {
                                 //     console.log("closing stream");
                                 // }
                                 c.end();
-                                resolve({stdout, stderr});
+                                resolve({stdout, stderr, exitCode});
                             })
                             .on('data', (data) => {
                                 if (verbose) {
