@@ -18,6 +18,8 @@ class SSHConnector extends Connector {
         };
         this.cwd = '.';
         this.type = 'ssh';
+
+        this.builder = this._execBuilder();
     }
 
     setCWD(cwd){
@@ -151,6 +153,35 @@ class SSHConnector extends Connector {
         // result.stdout = result.stdout.trimRight().split('\n').slice(0, -1).join('\n');
         // result = { ...result, exitCode }
         return result;
+    }
+
+    _execBuilder(options = { command, expects: [], timeout, persistent, shell }) {
+        return {
+
+            command: (command) => this._execBuilder({ ...options, command }),
+
+            expects: (expect, respond) => this._execBuilder({ ...options, expects: [{ expect, respond }, ...options.expects] }),
+
+            timeout: (timeout) => this._execBuilder({ ...options, timeout }),
+
+            persistent: () => this._execBuilder({ ...options, persistent: true }),
+
+            verbose: () => this._execBuilder({ ...options, verbose: true }),
+
+            /**
+             * execute with builder options
+             */
+            exec: () => {
+                if (options.persistent) {
+                    return this.execPersistent(options.command, undefined, timeout);
+                }
+
+                else {
+                    return this._JSSSHExec(`cd ${this.cwd} && ${options.command}`, this.sshConfig, options.timeout, options.verbose);
+                }
+            }
+
+        }
     }
 
     async _JSSSHExec(cmd, sshConfig, timeout = 5000, verbose = false, options = { count: 20, pty: false, x11: true, pipefail: true }) {
