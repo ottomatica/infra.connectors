@@ -155,7 +155,8 @@ class SSHConnector extends Connector {
         return result;
     }
 
-    _execBuilder(options = { command, expects: [], timeout, persistent, shell }) {
+    _execBuilder(options) {
+        if (options && !options.expects) options.expects = [];
         return {
 
             command: (command) => this._execBuilder({ ...options, command }),
