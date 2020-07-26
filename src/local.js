@@ -84,7 +84,9 @@ class LocalConnector {
         return this.cp(src, dest);
     }
 
-    async exec(cmd) {
+    async exec(cmd, options = { pipefail: true }) {
+        if (options.pipefail) cmd = 'set -o pipefail; ' + cmd;
+
         const { status, stdout, stderr, error } = child_process.spawnSync(cmd, { shell: true, cwd: this.cwd });
         return {
             exitCode: status != undefined ? status : 1,
