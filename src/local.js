@@ -85,7 +85,7 @@ class LocalConnector {
     }
 
     async exec(cmd, options = { pipefail: true }) {
-        if (options.pipefail && os.process() != "win32" ) cmd = 'set -o pipefail; ' + cmd;
+        if (options.pipefail && os.platform() != "win32" ) cmd = 'set -o pipefail; ' + cmd;
 
         const { status, stdout, stderr, error } = child_process.spawnSync(cmd, { shell: true, cwd: this.cwd });
         return {
