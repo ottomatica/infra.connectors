@@ -1,4 +1,5 @@
 const BakerConnector = require('./src/baker');
+const BakerxConnector = require('./src/bakerx');
 const SSHConnector = require('./src/ssh');
 const DockerConnector = require('./src/docker');
 const VagrantConnector = require('./src/vagrant');
@@ -21,6 +22,9 @@ class Connector {
 
             case 'baker':
                 return new BakerConnector({bakerPath: name});
+
+            case 'bakerx':
+                return new BakerxConnector(name);
 
             case 'ssh':
                 return new SSHConnector(name, opts.privateKey);
