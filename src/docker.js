@@ -1,6 +1,8 @@
 const Docker = require('dockerode');
 const stream = require('stream');
 const chalk  = require('chalk');
+const tar = require('tar');
+const path = require('path');
 const Connector = require('./connector');
 
 class DockerConnector extends Connector {
@@ -68,6 +70,15 @@ class DockerConnector extends Connector {
             console.error(chalk.red(' => Docker is not running so can\'t check for any matching containers.'));
         }
         return containerExists;
+    }
+
+    async scp(src, dest) {
+        let destContainer = this.docker.getContainer(this.containerId);
+
+        destContainer.putArchive(tar.c({ gzip: false, follow: true, cwd: path.dirname(src) }, [path.basename(src)]), { path: dest }, (writeError, writeStream) => {
+            if (writeError)
+                throw writeError;
+        });
     }
 
     async exec(cmd) {
