@@ -41,9 +41,9 @@ class DockerConnector extends Connector {
         return data.NetworkSettings.IPAddress;
     }
 
-    async run(image, cmd, name) {
+    async run(image, cmd) {
         await this.docker.createContainer({
-            name,
+            name: this.containerId,
             Image: image,
             AttachStdin: false,
             AttachStdout: true,
@@ -53,6 +53,11 @@ class DockerConnector extends Connector {
             OpenStdin: false,
             StdinOnce: false,
         }).then(container => container.start());
+    }
+
+    async delete() {
+        const container = this.docker.getContainer(this.containerId);
+        return await container.remove({ force: true });
     }
 
     async ready() {
