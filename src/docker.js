@@ -13,7 +13,7 @@ class DockerConnector extends Connector {
         this.type = 'docker';
     }
 
-    async pull(imageName) {
+    async pull(imageName, verbose = true) {
         let self = this;
         // console.log( `pulling ${imageName}`);
         process.stdout.write(`pulling ${imageName} `);
@@ -26,7 +26,7 @@ class DockerConnector extends Connector {
                     }
                     process.stdout.write('... pulled\n');
                     resolve(output);
-                }, event => console.log(event));
+                }, event => verbose && console.log(event));
             });
         });
     }
