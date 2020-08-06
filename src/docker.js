@@ -19,10 +19,12 @@ class DockerConnector extends Connector {
         process.stdout.write(`pulling ${imageName} `);
         return new Promise((resolve, reject) => {
             self.docker.pull(imageName, (error, stream) => {
+                
+                if (error) { reject(error); }
+                
                 self.docker.modem.followProgress(stream, (error, output) => {
                     if (error) {
                         reject(error);
-                        return;
                     }
                     process.stdout.write('... pulled\n');
                     resolve(output);
