@@ -37,7 +37,7 @@ class LocalConnector {
     }
 
     async getState(VMName) {
-        return "running";
+        return "ready";
     }
 
     async setup(context, setup) {

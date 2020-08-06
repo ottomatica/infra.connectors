@@ -40,8 +40,10 @@ class SSHConnector extends Connector {
 
     async getState() {
         try {
-            await this.ready();
-            return 'ready';
+            if (await this.ready())
+                return 'ready';
+            else
+                return 'timed out';
         } catch (err) {
             console.log('err', err);
             return 'timed out';

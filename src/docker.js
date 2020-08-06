@@ -56,9 +56,23 @@ class DockerConnector extends Connector {
     }
 
     async ready() {
+        let isReady = false;
         const containerExists = await this.containerExists();
 
-        if (!containerExists) throw Error(`Container isn't ready: ${this.containerId}`);
+        if(containerExists) {
+            const container = this.docker.getContainer(this.containerId);
+            isReady = (await container.inspect()).State.Running;
+        }
+
+        return isReady;
+    }
+
+    setCWD(cwd){
+        this.cwd = cwd;
+    }
+
+    getCWD(){
+        return this.cwd;
     }
 
     async containerExists() {
@@ -79,6 +93,18 @@ class DockerConnector extends Connector {
             if (writeError)
                 throw writeError;
         });
+    }
+
+    async getState() {
+        try {
+            if (await this.ready())
+                return 'ready';
+            else
+                return 'timed out';
+        } catch (err) {
+            console.log('err', err);
+            return 'timed out';
+        }
     }
 
     async exec(cmd) {
