@@ -94,10 +94,12 @@ class DockerConnector extends Connector {
     async scp(src, dest) {
         let destContainer = this.docker.getContainer(this.containerId);
 
-        destContainer.putArchive(tar.c({ gzip: false, follow: true, cwd: path.dirname(src) }, [path.basename(src)]), { path: dest }, (writeError, writeStream) => {
+        destContainer.putArchive(tar.c({ gzip: false, follow: true, cwd: path.dirname(src) }, [path.basename(src)]), { path: path.dirname(dest) }, (writeError, writeStream) => {
             if (writeError)
-                throw writeError;
+            throw writeError;
         });
+
+        await this.exec(`mv ${path.dirname(dest)}/${path.basename(src)} ${dest}`);
     }
 
     async getState() {
