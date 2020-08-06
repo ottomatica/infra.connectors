@@ -8,7 +8,7 @@ const Connector = require('./connector');
 class DockerConnector extends Connector {
     constructor(container) {
         super('docker@', 'privateKey@');
-        this.docker = new Docker({ socketPath: '/var/run/docker.sock' });
+        this.docker = new Docker();
         this.containerId = container;
         this.type = 'docker';
     }
