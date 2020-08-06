@@ -83,7 +83,7 @@ class DockerConnector extends Connector {
 
     async exec(cmd) {
         const self = this;
-        return { 'stdout': await new Promise(((resolve, reject) => {
+        return new Promise(((resolve, reject) => {
             let options = {
                 Cmd: ['bash', '-c', cmd],
                 // Cmd: ['bash', '-c', 'echo test $VAR'],
@@ -92,12 +92,17 @@ class DockerConnector extends Connector {
                 AttachStderr: true,
             };
             let container = self.docker.getContainer(self.containerId);
-            let logStream = new stream.PassThrough();
+            
+            let stdoutStream = new stream.PassThrough();
+            let stdout = '';
+            stdoutStream.on('data', (chunk) => {
+                stdout += chunk.toString('utf8');
+            });
 
-            let output = '';
-            logStream.on('data', (chunk) => {
-                // console.log(chunk.toString('utf8'));
-                output += chunk.toString('utf8');
+            let stderrStream = new stream.PassThrough();
+            let stderr = '';
+            stderrStream.on('data', (chunk) => {
+                stderr += chunk.toString('utf8');
             });
 
             container.exec(options, (err, exec) => {
@@ -105,20 +110,19 @@ class DockerConnector extends Connector {
                 exec.start((err, stream) => {
                     if (err) return;
 
-                    container.modem.demuxStream(stream, logStream, logStream);
-                    stream.on('end', () => {
-                        logStream.destroy();
-                        resolve(output);
-                    });
+                    container.modem.demuxStream(stream, stdoutStream, stderrStream);
+                    stream.on('end', async () => {
+                        stdoutStream.destroy();
 
-                    // exec.inspect(function(err, data) {
-                    //     if (err) return;
-                    //     console.log(data);
-                    // });
+                        const exitCode = (await exec.inspect()).ExitCode;
+
+                        resolve({stdout, stderr, exitCode});
+                    });
                 });
             });
-        }))};
+        }));
     }
+
     async isReachable(host, context) {
         //TODO
         return "Docker";
