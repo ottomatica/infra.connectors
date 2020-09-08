@@ -99,7 +99,7 @@ class LocalConnector {
     {
         if (options.pipefail && os.platform() != "win32" ) cmd = 'set -o pipefail; ' + cmd;
 
-        let child = child_process.spawn(cmd, { shell: true, cwd: conn.cwd });
+        let child = child_process.spawn(cmd, { shell: true, cwd: this.cwd });
 
         return new Promise(function(resolve, reject)
         {
