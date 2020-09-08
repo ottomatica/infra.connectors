@@ -182,7 +182,10 @@ class SSHConnector extends Connector {
         }
     }
 
-    async _JSSSHExec(cmd, sshConfig, timeout = 5000, verbose = false, options = { count: 20, pty: false, x11: false, pipefail: true, onProgress: undefined }) {
+    async _JSSSHExec(cmd, sshConfig, timeout = 5000, verbose = false, options ) {
+        let defaults = { count: 20, pty: false, x11: false, pipefail: true, onProgress: null };
+        options = Object.assign({}, defaults, options);
+
         if (options.pipefail) cmd = 'set -o pipefail; ' + cmd;
         let stdout = '';
         let stderr = '';
