@@ -218,7 +218,7 @@ class SSHConnector extends Connector {
                                 if (verbose) {
                                     process.stdout.write(chalk.gray(data));
                                 }
-                                if( onProgress ) { onProgress(data); }
+                                if( options.onProgress ) { options.onProgress(data); }
                                 stdout += data;
                                 if (options.setup && data.includes(options.setup.wait_for)) {
                                     c.end();
@@ -229,7 +229,7 @@ class SSHConnector extends Connector {
                                 if (verbose) {
                                     process.stderr.write(chalk.gray(data));
                                 }
-                                if( onProgress ) { onProgress(data); }
+                                if( options.onProgress ) { options.onProgress(data); }
                                 stderr += data;
                             });
                     });
