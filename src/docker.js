@@ -117,6 +117,16 @@ class DockerConnector extends Connector {
     }
 
     async exec(cmd) {
+        return this._exec(cmd);
+    }
+
+    async stream(cmd, onProgress) {
+        return this._exec(cmd, onProgress)
+    }
+
+    async _exec(cmd, onProgress) {
+        cmd = 'set -o pipefail; ' + cmd;
+
         const self = this;
         return new Promise(((resolve, reject) => {
             let options = {
@@ -131,13 +141,17 @@ class DockerConnector extends Connector {
             let stdoutStream = new stream.PassThrough();
             let stdout = '';
             stdoutStream.on('data', (chunk) => {
-                stdout += chunk.toString('utf8');
+                let data = chunk.toString('utf8');
+                stdout += data;
+                if( onProgress ) { onProgress(data); }
             });
 
             let stderrStream = new stream.PassThrough();
             let stderr = '';
             stderrStream.on('data', (chunk) => {
-                stderr += chunk.toString('utf8');
+                let data = chunk.toString('utf8'); 
+                stderr += data;
+                if( onProgress ) { onProgress(data); }
             });
 
             container.exec(options, (err, exec) => {

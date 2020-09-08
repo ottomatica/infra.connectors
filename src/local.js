@@ -95,6 +95,48 @@ class LocalConnector {
         }
     }
 
+    async stream(cmd)
+    {
+        if (options.pipefail && os.platform() != "win32" ) cmd = 'set -o pipefail; ' + cmd;
+
+        let child = child_process.spawn(cmd, { shell: true, cwd: conn.cwd });
+
+        return new Promise(function(resolve, reject)
+        {
+           let stdout="", stderr="";
+
+            // Collect stdout and stderr as it happens.
+            // Send callback progress.
+            child.stdout.on('data', (data) => {
+                stdout += data;
+                onProgress(data);
+            });
+            child.stderr.on('data', (data) => {
+                stderr += data;
+                onProgress(data);
+            });
+
+            // Usually an error related to creating process.
+            child.on('error', function(err)
+            {
+                resolve({
+                    exitCode: 1,
+                    stdout: '',
+                    stderr: (err.message || 'Failure to create command')
+                });
+            })
+
+            // Finished command, we can resolve progress with final results.
+            child.on('exit', (code) => {
+                resolve({
+                    exitCode: code,
+                    stdout: stdout ? stdout.toString() : '',
+                    stderr: stderr ? stderr.toString() : ''
+                });
+            });
+        });        
+    }
+
     // Execute and return pid
     async spawn(cmd, options) {
         return new Promise((resolve, reject) => {

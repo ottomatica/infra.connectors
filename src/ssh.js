@@ -109,26 +109,21 @@ class SSHConnector extends Connector {
     }
 
     async exec(cmd, verbose) {
-        if( verbose === undefined )
-        {
-            verbose = false;
-        }
+        if( verbose === undefined ) { verbose = false; }
+        cmd = 'set -o pipefail; ' + cmd;
         let result = await this._JSSSHExec(`cd ${this.cwd} && ${cmd}`, this.sshConfig, 5000, verbose);
-        // let exitCode = Number(result.stdout.trimRight().split('\n').slice(-1)[0].trim());
-        // result.stdout = result.stdout.trimRight().split('\n').slice(0,-1).join('\n').trimRight();
-        // result = {...result, exitCode}
         return result;
     }
 
     scp(src, dest) {
 
         let result = Utils.scp(src, dest, this.sshConfig);
-
     }
 
     /// exec cmd with streaming output
-    async stream(cmd) {
-        let result = await this._JSSSHExec(`cd ${this.cwd} && ${cmd}`, this.sshConfig, 5000, true);
+    async stream(cmd, onProgress) {
+        cmd = 'set -o pipefail; ' + cmd;
+        let result = await this._JSSSHExec(`cd ${this.cwd} && ${cmd}`, this.sshConfig, 5000, true, {onProgress: onProgress});
         return result;
     }
 
@@ -187,7 +182,7 @@ class SSHConnector extends Connector {
         }
     }
 
-    async _JSSSHExec(cmd, sshConfig, timeout = 5000, verbose = false, options = { count: 20, pty: false, x11: true, pipefail: true }) {
+    async _JSSSHExec(cmd, sshConfig, timeout = 5000, verbose = false, options = { count: 20, pty: false, x11: false, pipefail: true, onProgress: undefined }) {
         if (options.pipefail) cmd = 'set -o pipefail; ' + cmd;
         let stdout = '';
         let stderr = '';
@@ -220,6 +215,7 @@ class SSHConnector extends Connector {
                                 if (verbose) {
                                     process.stdout.write(chalk.gray(data));
                                 }
+                                if( onProgress ) { onProgress(data); }
                                 stdout += data;
                                 if (options.setup && data.includes(options.setup.wait_for)) {
                                     c.end();
@@ -230,6 +226,7 @@ class SSHConnector extends Connector {
                                 if (verbose) {
                                     process.stderr.write(chalk.gray(data));
                                 }
+                                if( onProgress ) { onProgress(data); }
                                 stderr += data;
                             });
                     });
