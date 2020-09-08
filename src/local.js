@@ -95,7 +95,7 @@ class LocalConnector {
         }
     }
 
-    async stream(cmd, options = { pipefail: true })
+    async stream(cmd, onProgress, options = { pipefail: true })
     {
         if (options.pipefail && os.platform() != "win32" ) cmd = 'set -o pipefail; ' + cmd;
 
