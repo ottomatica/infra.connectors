@@ -93,6 +93,11 @@ class DockerConnector extends Connector {
         return containerExists;
     }
 
+    async readFile(src) {
+        let result = await this.exec( `cat ${src}`);
+        return result.stdout;
+    }
+
     async scp(src, dest) {
         let destContainer = this.docker.getContainer(this.containerId);
 

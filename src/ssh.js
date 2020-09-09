@@ -115,6 +115,15 @@ class SSHConnector extends Connector {
         return result;
     }
 
+    async readFile(src) {
+        let result = await this.exec( `cat ${src}`);
+        return result.stdout;
+    }
+
+    cp(src, dest) {
+        this.scp(src, dest);
+    }
+
     scp(src, dest) {
 
         let result = Utils.scp(src, dest, this.sshConfig);
