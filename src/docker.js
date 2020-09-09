@@ -13,7 +13,7 @@ class DockerConnector extends Connector {
         this.type = 'docker';
     }
 
-    async pull(imageName, verbose = true) {
+    async pull(imageName, onProgress, verbose = true) {
         let self = this;
         // console.log( `pulling ${imageName}`);
         process.stdout.write(`pulling ${imageName} `);
@@ -22,6 +22,11 @@ class DockerConnector extends Connector {
                 
                 if (error) { reject(error); }
                 
+                if( onProgress ) 
+                {
+                    stream.on('data', onProgress);
+                }
+
                 self.docker.modem.followProgress(stream, (error, output) => {
                     if (error) {
                         reject(error);
