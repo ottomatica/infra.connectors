@@ -93,9 +93,23 @@ class LocalConnector {
 
         let stdout = "";
         let stderr = "";
+        let self = this;
         return new Promise(function(resolve, reject)
         {
-            let child = child_process.spawnSync("Cmd.exe", { cwd: this.cwd });
+            let child = child_process.spawn("Cmd.exe",  ['/q', '/K'], 
+                { cwd: self.cwd, shell: true });
+
+            let lines = cmd.split(/\r?\n/);
+
+            child.stdin.write('@echo off\n');
+            child.stdin.write('echo.\n');
+
+            for( let line of lines )
+            {
+                if( !line.endsWith('\n') )
+                    line = line + '\n';
+                child.stdin.write(line);
+            }
 
             child.stdout.on('data', (data) => {
                 stdout+=data;
@@ -114,8 +128,8 @@ class LocalConnector {
                 resolve({stdout: stdout, stderr: stderr, exitCode: code})
             });
 
-            child.stdin.write(cmd);
             child.stdin.end();
+
         });
 
     }
@@ -128,6 +142,7 @@ class LocalConnector {
             {
                 return false;
             }
+            return true;
         }
         return false;
     }

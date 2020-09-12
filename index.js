@@ -39,3 +39,10 @@ class Connector {
 }
 
 module.exports = Connector;
+
+// (async () => {
+//     let conn = new LocalConnector();
+//     console.log( conn.shouldUseMultiLine("echo 1\r\necho 2\n"));
+//     let res = await conn.exec("echo 1\r\necho 2\n");
+//     console.log(res);
+// })();
