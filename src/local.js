@@ -154,6 +154,12 @@ class LocalConnector {
                 reject({err: error.message });
             });
 
+            if( options.detached )
+            {
+                // explicitly detach from parent so parent does not wait on us.
+                child.unref();
+            }
+
             // child.stdout.on('data', (data) => {
             //     console.log(data);
             // });
