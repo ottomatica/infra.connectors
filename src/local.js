@@ -151,7 +151,7 @@ class LocalConnector {
 
             child.stderr.on('data', (error) => {
                 console.error(error.message);
-                reject({ error });
+                reject({err: error.message });
             });
 
             // child.stdout.on('data', (data) => {
