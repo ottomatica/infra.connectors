@@ -88,14 +88,66 @@ class LocalConnector {
         return this.cp(src, dest);
     }
 
+    /* strategy for supporting multiple lines in windows */
+    async execMultiLine(cmd) {
+
+        let stdout = "";
+        let stderr = "";
+        return new Promise(function(resolve, reject)
+        {
+            let child = child_process.spawnSync("Cmd.exe", { cwd: this.cwd });
+
+            child.stdout.on('data', (data) => {
+                stdout+=data;
+            });
+            
+            child.stderr.on('data', (data) => {
+                stderr+=data;
+            });
+
+            child.on('error', (err) => {
+                resolve({stdout: stdout, stderr: err.message, exitCode: code});
+            });
+
+
+            child.on('close', (code) => {
+                resolve({stdout: stdout, stderr: stderr, exitCode: code})
+            });
+
+            child.stdin.write(cmd);
+            child.stdin.end();
+        });
+
+    }
+
+    shouldUseMultiLine(cmd) {
+        if( os.platform() == 'win32' && cmd.indexOf('\n') > 0 )
+        {
+            // don't do things meant to be run in scripts/other shells
+            if( cmd.indexOf("powershell") >= 0 || cmd.indexOf("bash") >= 0 )
+            {
+                return false;
+            }
+        }
+        return false;
+    }
+    
+
     async exec(cmd, options = { pipefail: true }) {
         if (options.pipefail && os.platform() != "win32" ) cmd = 'set -o pipefail; ' + cmd;
 
-        const { status, stdout, stderr, error } = child_process.spawnSync(cmd, { shell: true, cwd: this.cwd });
-        return {
-            exitCode: status != undefined ? status : 1,
-            stdout: stdout ? stdout.toString() : '',
-            stderr: stderr ? stderr.toString() : (error.message || '')
+        if( this.shouldUseMultiLine(cmd) )
+        {
+            return await this.execMultiLine(cmd);
+        }
+        else
+        {
+            const { status, stdout, stderr, error } = child_process.spawnSync(cmd, { shell: true, cwd: this.cwd });
+            return {
+                exitCode: status != undefined ? status : 1,
+                stdout: stdout ? stdout.toString() : '',
+                stderr: stderr ? stderr.toString() : (error.message || '')
+            }
         }
     }
 
