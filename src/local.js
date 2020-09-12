@@ -99,7 +99,7 @@ class LocalConnector {
             let child = child_process.spawn("Cmd.exe",  ['/q', '/K'], 
                 { cwd: self.cwd, shell: true });
 
-            let lines = cmd.split(/\r?\n/);
+            let lines = cmd.split(/\r?\n/g);
 
             child.stdin.write('@echo off\n');
             child.stdin.write('echo.\n');
@@ -125,7 +125,8 @@ class LocalConnector {
 
 
             child.on('close', (code) => {
-                resolve({stdout: stdout, stderr: stderr, exitCode: code})
+                let patchStdout = stdout.split(/r?\n/g).slice(1).join('\n');
+                resolve({stdout: patchStdout, stderr: stderr, exitCode: code})
             });
 
             child.stdin.end();
