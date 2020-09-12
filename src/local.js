@@ -149,10 +149,13 @@ class LocalConnector {
             options.cwd = this.cwd;
             let child = child_process.spawn(cmd, options);
 
-            child.stderr.on('data', (error) => {
-                console.error(error.toString());
-                reject({err: error.toString() });
-            });
+            if (options.stdin != "ignore" )
+            {
+                child.stderr.on('data', (error) => {
+                    console.error(error.toString());
+                    reject({err: error.toString() });
+                });
+            }
 
             if( options.detached )
             {
