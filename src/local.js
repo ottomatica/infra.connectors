@@ -77,7 +77,7 @@ class LocalConnector {
     }
 
     async readFile(src) {
-        return fs.promises.readFile(src);
+        return (await fs.promises.readFile(src)).toString();
     }
 
     async cp(src, dest) {
