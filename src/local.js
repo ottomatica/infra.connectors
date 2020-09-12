@@ -150,8 +150,8 @@ class LocalConnector {
             let child = child_process.spawn(cmd, options);
 
             child.stderr.on('data', (error) => {
-                console.error(error.message);
-                reject({err: error.message });
+                console.error(error.toString());
+                reject({err: error.toString() });
             });
 
             if( options.detached )
