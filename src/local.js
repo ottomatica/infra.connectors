@@ -219,10 +219,10 @@ class LocalConnector {
 
             if (options.stdio != "ignore" )
             {
-                child.stderr.on('data', (error) => {
-                    console.error(error.toString());
-                    reject({err: error.toString() });
-                });
+                // child.stderr.on('data', (error) => {
+                //     console.error(error.toString());
+                //     reject({err: error.toString() });
+                // });
             }
 
             if( options.detached )
