@@ -127,9 +127,9 @@ tmpfile=$(mktemp)
 cat << 'DOCABLE_END_DOC' > $tmpfile-${name}
 ${content}
 DOCABLE_END_DOC
-echo $tmpfile-${name}
+echo -e $tmpfile-${name}
 `);
-        return result.stdout;
+        return result.stdout.trim();
     }
 
     cp(src, dest) {
