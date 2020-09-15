@@ -18,24 +18,25 @@ class DockerConnector extends Connector {
         // console.log( `pulling ${imageName}`);
         process.stdout.write(`pulling ${imageName} `);
         return new Promise((resolve, reject) => {
-            self.docker.pull(imageName, (error, stream) => {
+            self.docker.pull(imageName, async (error, stream) => {
                 
                 if (error) { reject(error); }
                 
-                if( onProgress ) 
-                {
-                    stream.on('data', onProgress);
-                }
-
-                self.docker.modem.followProgress(stream, (error, output) => {
+                let onFinished = (error, output) => {
                     if (error) {
-                        stream.removeAllListeners('data');
                         reject(error);
                     }
                     process.stdout.write('... pulled\n');
-                    stream.removeAllListeners('data');
                     resolve(output);
-                }, (event) =>{ if( verbose){ console.log(event) }});
+                }
+
+                let onProgress = onProgress;
+                if( onProgress == undefined ) 
+                {
+                    onProgress = (data) => { if(verbose){ console.log(data) }};
+                }
+
+                self.docker.modem.followProgress(stream, onFinished, onProgress);
             });
         });
     }
