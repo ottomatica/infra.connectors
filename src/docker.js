@@ -29,11 +29,13 @@ class DockerConnector extends Connector {
 
                 self.docker.modem.followProgress(stream, (error, output) => {
                     if (error) {
+                        stream.removeAllListeners('data');
                         reject(error);
                     }
                     process.stdout.write('... pulled\n');
+                    stream.removeAllListeners('data');
                     resolve(output);
-                }, event => verbose && console.log(event));
+                }, (event) =>{ if( verbose){ console.log(event) }});
             });
         });
     }
