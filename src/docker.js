@@ -149,9 +149,11 @@ echo -e $tmpfile-${name}
     }
 
     async _exec(cmd, onProgress, execOptions) {
-        cmd = 'set -o pipefail; ' + cmd;
-
         execOptions = execOptions || {};
+
+        if( execOptions.pipefail ) {
+            cmd = 'set -o pipefail; ' + cmd;
+        }
  
         const self = this;
         return new Promise(((resolve, reject) => {

@@ -158,7 +158,9 @@ ${content}
     }
     
 
-    async exec(cmd, options = { pipefail: true }) {
+    async exec(cmd, options ) {
+        options = options || {};
+
         if (options.pipefail && os.platform() != "win32" ) cmd = 'set -o pipefail; ' + cmd;
 
         if( this.shouldUseMultiLine(cmd) )
@@ -176,8 +178,10 @@ ${content}
         }
     }
 
-    async stream(cmd, onProgress, options = { pipefail: true })
+    async stream(cmd, onProgress, options)
     {
+        options = options || {};
+
         if (options.pipefail && os.platform() != "win32" ) cmd = 'set -o pipefail; ' + cmd;
 
         let child = child_process.spawn(cmd, { shell: true, cwd: this.cwd });

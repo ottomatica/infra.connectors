@@ -112,7 +112,9 @@ class SSHConnector extends Connector {
         if( options === undefined ) options = {};
         let verbose = options.verbose || false;
 
-        cmd = 'set -o pipefail; ' + cmd;
+        if( options.pipefail ) {
+            cmd = 'set -o pipefail; ' + cmd;
+        }
         let result = await this._JSSSHExec(`cd ${this.cwd} && ${cmd}`, this.sshConfig, 5000, verbose, options);
         return result;
     }
@@ -144,8 +146,11 @@ echo -e $tmpfile-${name}
     }
 
     /// exec cmd with streaming output
-    async stream(cmd, onProgress) {
-        cmd = 'set -o pipefail; ' + cmd;
+    async stream(cmd, onProgress, options) {
+        options = options || {};
+        if( options.pipefail ) {
+            cmd = 'set -o pipefail; ' + cmd;
+        }
         let result = await this._JSSSHExec(`cd ${this.cwd} && ${cmd}`, this.sshConfig, 5000, true, {onProgress: onProgress});
         return result;
     }
@@ -206,13 +211,12 @@ echo -e $tmpfile-${name}
     }
 
     async _JSSSHExec(cmd, sshConfig, timeout = 5000, verbose = false, options ) {
-        let defaults = { count: 20, pty: false, x11: false, pipefail: true, onProgress: null };
+        let defaults = { count: 20, pty: false, x11: false, onProgress: null };
         options = Object.assign({}, defaults, options);
 
         if( options.tty )
             options.pty = true;
 
-        if (options.pipefail) cmd = 'set -o pipefail; ' + cmd;
         let stdout = '';
         let stderr = '';
 
