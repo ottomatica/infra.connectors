@@ -5,7 +5,7 @@ const si = require('systeminformation');
 const checkDiskSpace = require('check-disk-space');
 const got = require('got');
 const path = require('path');
-
+const { v4: uuidv4 } = require('uuid');
 
 class LocalConnector {
 
@@ -78,6 +78,15 @@ class LocalConnector {
 
     async readFile(src) {
         return (await fs.promises.readFile(src)).toString();
+    }
+
+    async writeTempFile(name, content) {
+        let scriptPath = path.join(os.tmpdir(), uuidv4() + name );
+        await fs.promises.writeFile( scriptPath,
+`
+${content}
+`);
+        return scriptPath;
     }
 
     async cp(src, dest) {

@@ -103,6 +103,18 @@ class DockerConnector extends Connector {
         return result.stdout;
     }
 
+    async writeTempFile(name, content) {
+        let result = await this.exec( 
+`
+tmpfile=$(mktemp)
+cat << 'DOCABLE_END_DOC' > $tmpfile-${name}
+${content}
+DOCABLE_END_DOC
+echo $tmpfile-${name}
+`);
+        return result.stdout;
+    }
+
     async scp(src, dest) {
         let destContainer = this.docker.getContainer(this.containerId);
 

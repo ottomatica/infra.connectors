@@ -120,6 +120,18 @@ class SSHConnector extends Connector {
         return result.stdout;
     }
 
+    async writeTempFile(name, content) {
+        let result = await this.exec( 
+`
+tmpfile=$(mktemp)
+cat << 'DOCABLE_END_DOC' > $tmpfile-${name}
+${content}
+DOCABLE_END_DOC
+echo $tmpfile-${name}
+`);
+        return result.stdout;
+    }
+
     cp(src, dest) {
         this.scp(src, dest);
     }
