@@ -140,15 +140,15 @@ echo -e $tmpfile-${name}
         }
     }
 
-    async exec(cmd) {
-        return this._exec(cmd);
+    async exec(cmd, options) {
+        return this._exec(cmd, () => {}, options);
     }
 
     async stream(cmd, onProgress) {
         return this._exec(cmd, onProgress)
     }
 
-    async _exec(cmd, onProgress) {
+    async _exec(cmd, onProgress, execOptions) {
         cmd = 'set -o pipefail; ' + cmd;
 
         const self = this;
@@ -160,6 +160,12 @@ echo -e $tmpfile-${name}
                 AttachStdout: true,
                 AttachStderr: true,
             };
+
+            if( execOptions.tty )
+            {
+                options.Tty = true;
+            }
+
             let container = self.docker.getContainer(self.containerId);
             
             let stdoutStream = new stream.PassThrough();
