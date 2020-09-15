@@ -30,7 +30,6 @@ class DockerConnector extends Connector {
                     resolve(output);
                 }
 
-                let onProgress = onProgress;
                 if( onProgress == undefined ) 
                 {
                     onProgress = (data) => { if(verbose){ console.log(data) }};
