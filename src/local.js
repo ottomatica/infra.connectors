@@ -169,7 +169,8 @@ ${content}
         }
         else
         {
-            const { status, stdout, stderr, error } = child_process.spawnSync(cmd, { shell: true, cwd: this.cwd });
+            const { status, stdout, stderr, error } = child_process.spawnSync(cmd, 
+                { shell: true, cwd: this.cwd, stdio: ['pipe', 'inherit', 'pipe'] });
             return {
                 exitCode: status != undefined ? status : 1,
                 stdout: stdout ? stdout.toString() : '',
