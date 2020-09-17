@@ -164,7 +164,7 @@ echo -e $tmpfile-${name}
                 if( path.isAbsolute(this.cwd )) {
                     workingDir = this.cwd;
                 } else {
-                    path.join("/", this.cwd);
+                    workingDir = path.join("/", this.cwd);
                 }
             }
 
