@@ -157,13 +157,24 @@ echo -e $tmpfile-${name}
  
         const self = this;
         return new Promise(((resolve, reject) => {
+
+            let workingDir = "/";
+            if( this.cwd )
+            {
+                if( path.isAbsolute(this.cwd )) {
+                    workingDir = this.cwd;
+                } else {
+                    path.join("/", this.cwd);
+                }
+            }
+
             let options = {
                 Cmd: ['bash', '-c', cmd],
                 // Cmd: ['bash', '-c', 'echo test $VAR'],
                 // Env: ['VAR=ttslkfjsdalkfj'],
                 AttachStdout: true,
                 AttachStderr: true,
-                WorkingDir: this.cwd || "/"
+                WorkingDir: workingDir
             };
 
             if( execOptions.tty )
