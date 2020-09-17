@@ -163,6 +163,7 @@ echo -e $tmpfile-${name}
                 // Env: ['VAR=ttslkfjsdalkfj'],
                 AttachStdout: true,
                 AttachStderr: true,
+                WorkingDir: this.cwd || "/"
             };
 
             if( execOptions.tty )
