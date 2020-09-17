@@ -173,7 +173,8 @@ echo -e $tmpfile-${name}
 
             let container = self.docker.getContainer(self.containerId);
             
-            let workingDir = container.WorkingDir;
+            let workingDir = container.WorkingDir || "/";
+            console.log( `container working dir: ${container.WorkingDir}` );
             if( this.cwd && this.cwd != '.' )
             {
                 if( path.isAbsolute(this.cwd )) {
