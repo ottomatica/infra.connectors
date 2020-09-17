@@ -158,16 +158,6 @@ echo -e $tmpfile-${name}
         const self = this;
         return new Promise(((resolve, reject) => {
 
-            let workingDir = "/";
-            if( this.cwd )
-            {
-                if( path.isAbsolute(this.cwd )) {
-                    workingDir = this.cwd;
-                } else {
-                    workingDir = path.join("/", this.cwd);
-                }
-            }
-
             let options = {
                 Cmd: ['bash', '-c', cmd],
                 // Cmd: ['bash', '-c', 'echo test $VAR'],
@@ -184,6 +174,16 @@ echo -e $tmpfile-${name}
 
             let container = self.docker.getContainer(self.containerId);
             
+            let workingDir = container.WorkingDir;
+            if( this.cwd && this.cwd != '.' )
+            {
+                if( path.isAbsolute(this.cwd )) {
+                    workingDir = this.cwd;
+                } else {
+                    workingDir = path.join(workingDir, this.cwd);
+                }
+            }
+
             let stdoutStream = new stream.PassThrough();
             let stdout = '';
             stdoutStream.on('data', (chunk) => {
