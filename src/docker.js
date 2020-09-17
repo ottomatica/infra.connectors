@@ -183,7 +183,8 @@ echo -e $tmpfile-${name}
                     workingDir = path.join(workingDir, this.cwd);
                 }
             }
-            options.WorkingDir = workingDir;
+            // if host is windows, will need to convert to posix.
+            options.WorkingDir = workingDir.replace(/\\/g, "/");
             console.log( `updated working dir: ${workingDir}` );
 
             let stdoutStream = new stream.PassThrough();
