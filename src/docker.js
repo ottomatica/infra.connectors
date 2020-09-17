@@ -174,7 +174,7 @@ echo -e $tmpfile-${name}
             let container = self.docker.getContainer(self.containerId);
             
             let workingDir = container.WorkingDir || "/";
-            console.log( `container working dir: ${container.WorkingDir}` );
+            console.log( `container working dir: ${workingDir}` );
             if( this.cwd && this.cwd != '.' )
             {
                 if( path.isAbsolute(this.cwd )) {
@@ -184,6 +184,7 @@ echo -e $tmpfile-${name}
                 }
             }
             options.WorkingDir = workingDir;
+            console.log( `updated working dir: ${workingDir}` );
 
             let stdoutStream = new stream.PassThrough();
             let stdout = '';
