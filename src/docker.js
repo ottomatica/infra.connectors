@@ -164,7 +164,6 @@ echo -e $tmpfile-${name}
                 // Env: ['VAR=ttslkfjsdalkfj'],
                 AttachStdout: true,
                 AttachStderr: true,
-                WorkingDir: workingDir
             };
 
             if( execOptions.tty )
@@ -183,6 +182,7 @@ echo -e $tmpfile-${name}
                     workingDir = path.join(workingDir, this.cwd);
                 }
             }
+            options.WorkingDir = workingDir;
 
             let stdoutStream = new stream.PassThrough();
             let stdout = '';
