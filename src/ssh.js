@@ -137,12 +137,11 @@ echo -e $tmpfile-${name}
     }
 
     cp(src, dest) {
-        this.scp(src, dest);
+        return this.scp(src, dest);
     }
 
     scp(src, dest) {
-
-        let result = Utils.scp(src, dest, this.sshConfig);
+        return Utils.scp(src, dest, this.sshConfig);
     }
 
     /// exec cmd with streaming output
