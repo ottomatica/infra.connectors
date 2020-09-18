@@ -157,6 +157,7 @@ echo -e $tmpfile-${name}
  
         const self = this;
         return new Promise(((resolve, reject) => {
+
             let options = {
                 Cmd: ['bash', '-c', cmd],
                 // Cmd: ['bash', '-c', 'echo test $VAR'],
@@ -172,6 +173,20 @@ echo -e $tmpfile-${name}
 
             let container = self.docker.getContainer(self.containerId);
             
+            let workingDir = container.WorkingDir || "/";
+            // console.log( `container working dir: ${workingDir}` );
+            if( this.cwd && this.cwd != '.' )
+            {
+                if( path.isAbsolute(this.cwd )) {
+                    workingDir = this.cwd;
+                } else {
+                    workingDir = path.join(workingDir, this.cwd);
+                }
+            }
+            // if host is windows, will need to convert to posix.
+            options.WorkingDir = workingDir.replace(/\\/g, "/");
+            // console.log( `updated working dir: ${workingDir}` );
+
             let stdoutStream = new stream.PassThrough();
             let stdout = '';
             stdoutStream.on('data', (chunk) => {
