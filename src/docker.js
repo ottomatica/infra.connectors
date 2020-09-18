@@ -50,7 +50,10 @@ class DockerConnector extends Connector {
         return data.NetworkSettings.IPAddress;
     }
 
-    async run(image, cmd) {
+    async run(image, cmd, options) {
+
+        options = options || {};
+
         await this.docker.createContainer({
             name: this.containerId,
             Image: image,
@@ -61,6 +64,10 @@ class DockerConnector extends Connector {
             Cmd: Array.isArray(cmd) ? cmd : [cmd],
             OpenStdin: false,
             StdinOnce: false,
+            HostConfig: {
+                Memory: options.Memory || 0,
+                NanoCPUs: options.NanoCPUs || 1000000000
+            }
         }).then(container => container.start());
     }
 
