@@ -269,7 +269,8 @@ echo -e $tmpfile-${name}
                         return;
                     }
 
-                    resolve({stdout: "", stderr:"", exitCode: 0});
+                    // exec doesn't necessarily expose pids, we'll just return supervisor.
+                    resolve({stdout: "", stderr:"", pid: 1, exitCode: 0});
                 });
             });
         }));
