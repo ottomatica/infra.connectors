@@ -228,6 +228,53 @@ echo -e $tmpfile-${name}
         }));
     }
 
+    // We "fire-n-forget".
+    async spawn(cmd, execOptions) {
+        execOptions = execOptions || {};
+
+        if( execOptions.pipefail ) {
+            cmd = 'set -o pipefail; ' + cmd;
+        }
+ 
+        const self = this;
+        return new Promise(((resolve, reject) => {
+
+            let options = {
+                Cmd: ['bash', '-c', cmd],
+                AttachStdout: false,
+                AttachStderr: false,
+            };
+
+            let container = self.docker.getContainer(self.containerId);
+            let workingDir = container.WorkingDir || "/";
+            if( this.cwd && this.cwd != '.' )
+            {
+                if( path.isAbsolute(this.cwd )) {
+                    workingDir = this.cwd;
+                } else {
+                    workingDir = path.join(workingDir, this.cwd);
+                }
+            }
+            // if host is windows, will need to convert to posix.
+            options.WorkingDir = workingDir.replace(/\\/g, "/");
+
+            container.exec(options, (err, exec) => {
+                if (err) {
+                    resolve({stdout: "", stderr:err.message, exitCode: 1});
+                    return;
+                }
+                exec.start((err, stream) => {
+                    if (err) {
+                        resolve({stdout: "", stderr:err.message, exitCode: 1});
+                        return;
+                    }
+
+                    resolve({stdout: "", stderr:"", exitCode: 0});
+                });
+            });
+        }));
+    }
+
     async isReachable(host, context) {
         //TODO
         return "Docker";

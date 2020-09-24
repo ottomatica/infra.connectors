@@ -41,8 +41,19 @@ class Connector {
 module.exports = Connector;
 
 // (async () => {
-//     let conn = new LocalConnector();
-//     console.log( conn.shouldUseMultiLine("echo 1\r\necho 2\n"));
-//     let res = await conn.exec("echo 1\r\necho 2\n");
-//     console.log(res);
+    // let conn = new LocalConnector();
+    // console.log( conn.shouldUseMultiLine("echo 1\r\necho 2\n"));
+    // let res = await conn.exec("echo 1\r\necho 2\n");
+    // console.log(res);
+
+    // let docker = new DockerConnector("foo");
+    // await docker.run("node:12-buster", "/bin/sh");
+
+    // let result = await docker.exec("npm install http-server -g");
+    // console.log(result );
+    // result = await docker.spawn("http-server -p 8888");
+    // console.log(result );
+    // console.log( await docker.exec("wget -qO- localhost:8888") );
+
+    // docker.delete();
 // })();
