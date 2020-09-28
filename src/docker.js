@@ -3,7 +3,9 @@ const stream = require('stream');
 const chalk  = require('chalk');
 const tar = require('tar');
 const path = require('path');
+const fs = require('fs');
 const Connector = require('./connector');
+const { fsOpenFiles } = require('systeminformation');
 
 class DockerConnector extends Connector {
     constructor(container) {
@@ -132,6 +134,8 @@ echo -e $tmpfile-${name}
             throw writeError;
         });
 
+        if( (await fs.promises.lstat()).isDirectory(src) )
+            return {exitCode: 0, stdout: `Copied ${src} to ${dest}`, stderr: ""};
         return await this.exec(`mv ${path.dirname(dest)}/${path.basename(src)} ${dest}`);
     }
 
