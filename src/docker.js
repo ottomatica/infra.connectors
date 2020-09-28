@@ -134,7 +134,7 @@ echo -e $tmpfile-${name}
             throw writeError;
         });
 
-        if( (await fs.promises.lstat()).isDirectory(src) )
+        if( (await fs.promises.lstat(src)).isDirectory() )
             return {exitCode: 0, stdout: `Copied ${src} to ${dest}`, stderr: ""};
         return await this.exec(`mv ${path.dirname(dest)}/${path.basename(src)} ${dest}`);
     }
