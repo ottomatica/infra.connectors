@@ -25,6 +25,10 @@ class Utils {
         scpArgs.push(`StrictHostKeyChecking=no`);
         scpArgs.push(`-o`);
         scpArgs.push(`UserKnownHostsFile=/dev/null`);
+        if( fs.existsSync(src) && fs.lstatSync(src).isDirectory() )
+        {
+            scpArgs.push("-r");            
+        }
         scpArgs.push(`"${src}"`);
         scpArgs.push(`"${dest}"`);
 
