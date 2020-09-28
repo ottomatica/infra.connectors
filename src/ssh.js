@@ -141,7 +141,12 @@ echo -e $tmpfile-${name}
     }
 
     scp(src, dest) {
-        return Utils.scp(src, dest, this.sshConfig);
+        let spawnResult = Utils.scp(src, dest, this.sshConfig);
+        return {
+            exitCode: spawnResult.status, 
+            stdout: spawnResult.stdout, 
+            stderr: spawnResult.stderr
+        };
     }
 
     /// exec cmd with streaming output

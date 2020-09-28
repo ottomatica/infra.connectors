@@ -29,7 +29,7 @@ class Utils {
         scpArgs.push(`"${dest}"`);
 
         // console.log(scpArgs);
-        return child.spawnSync(`scp`, scpArgs, {stdio: 'inherit', shell: true});
+        return child.spawnSync(`scp`, scpArgs, {shell: true});
     }
 }
 
