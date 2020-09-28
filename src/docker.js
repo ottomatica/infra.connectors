@@ -115,11 +115,11 @@ class DockerConnector extends Connector {
     async writeTempFile(name, content) {
         let result = await this.exec( 
 `
-tmpfile=$(mktemp)
-cat << 'DOCABLE_END_DOC' > $tmpfile-${name}
+tmpfile=$(mktemp -t ${name})
+cat << 'DOCABLE_END_DOC' > $tmpfile
 ${content}
 DOCABLE_END_DOC
-echo -e $tmpfile-${name}
+echo -e $tmpfile
 `);
         return result.stdout.trim();
     }
