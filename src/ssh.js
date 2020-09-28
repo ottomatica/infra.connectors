@@ -144,8 +144,8 @@ echo -e $tmpfile-${name}
         let spawnResult = Utils.scp(src, dest, this.sshConfig);
         return {
             exitCode: spawnResult.status, 
-            stdout: spawnResult.stdout, 
-            stderr: spawnResult.stderr
+            stdout: spawnResult.stdout.toString(), 
+            stderr: spawnResult.stderr.toString()
         };
     }
 
