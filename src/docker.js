@@ -132,7 +132,7 @@ echo -e $tmpfile-${name}
             throw writeError;
         });
 
-        await this.exec(`mv ${path.dirname(dest)}/${path.basename(src)} ${dest}`);
+        return await this.exec(`mv ${path.dirname(dest)}/${path.basename(src)} ${dest}`);
     }
 
     async getState() {
