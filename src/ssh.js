@@ -127,11 +127,11 @@ class SSHConnector extends Connector {
     async writeTempFile(name, content) {
         let result = await this.exec( 
 `
-tmpfile=$(mktemp -t ${name})
-cat << 'DOCABLE_END_DOC' > $tmpfile
+tmpfile=$(mktemp -u)
+cat << 'DOCABLE_END_DOC' > $tmpfile-${name}
 ${content}
 DOCABLE_END_DOC
-echo -e $tmpfile
+echo -e $tmpfile-${name}
 `);
         return result.stdout.trim();
     }
