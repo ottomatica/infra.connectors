@@ -54,7 +54,7 @@ class SSHConnector extends Connector {
         let counter = 0;
         while (counter++ <= 1) {
             try {
-                await this.exec('ls');
+                await this.exec('ls', { retry: false });
                 return true;
             } catch (e) {
                 return false;
@@ -108,8 +108,7 @@ class SSHConnector extends Connector {
         }
     }
 
-    async exec(cmd, options) {
-        if( options === undefined ) options = {};
+    async exec(cmd, options = { retry: true }) {
         let verbose = options.verbose || false;
 
         if( options.pipefail ) {
@@ -214,7 +213,7 @@ echo -e $tmpfile-${name}
         }
     }
 
-    async _JSSSHExec(cmd, sshConfig, timeout = 5000, verbose = false, options ) {
+    async _JSSSHExec(cmd, sshConfig, timeout = 5000, verbose = false, options = { retry: true } ) {
         let defaults = { count: 20, pty: false, x11: false, onProgress: null };
         options = Object.assign({}, defaults, options);
 
@@ -271,7 +270,7 @@ echo -e $tmpfile-${name}
 
                     console.error(err.message);
 
-                    if (err.message.indexOf('ECONNRESET') >= 0 || err.message.indexOf('ECONNREFUSED') >= 0 || err.message.indexOf('Timed out while waiting for handshake') >= 0) {
+                    if ((err.message.indexOf('ECONNRESET') >= 0 || err.message.indexOf('ECONNREFUSED') >= 0 || err.message.indexOf('Timed out while waiting for handshake') >= 0) && options.retry) {
                         // Give vm 1 more seconds to get ready
                         console.error(`Waiting 1 second for ${sshConfig.hostname}:${sshConfig.port} to be ready`);
                         setTimeout(async () => {
