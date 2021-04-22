@@ -18,7 +18,7 @@
     "dockerode": "^2.5.8",
     "fs-extra": "^9.0.1",
     "got": "^11.5.2",
-    "js-yaml": "^3.14.0",
+    "js-yaml": "^4.1.0",
     "ssh2": "^0.8.7",
     "systeminformation": "^4.27.1",
     "tar": "^6.0.2",
