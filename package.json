@@ -21,7 +21,7 @@
     "js-yaml": "^3.14.0",
     "ssh2": "^0.8.7",
     "systeminformation": "^4.27.1",
-    "tar": "^6.0.2",
+    "tar": "^6.1.9",
     "uuid": "^8.3.0"
   },
   "devDependencies": {
