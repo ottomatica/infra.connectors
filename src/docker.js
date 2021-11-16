@@ -4,8 +4,9 @@ const chalk  = require('chalk');
 const tar = require('tar');
 const path = require('path');
 const fs = require('fs');
+const { v4: uuidv4 } = require('uuid');
+
 const Connector = require('./connector');
-const { fsOpenFiles } = require('systeminformation');
 
 class DockerConnector extends Connector {
     constructor(container) {
@@ -155,8 +156,12 @@ echo -e $tmpfile-${name}
         return this._exec(cmd, () => {}, options);
     }
 
-    async stream(cmd, onProgress) {
-        return this._exec(cmd, onProgress)
+    async stream(cmd, onProgress, options) {
+        return this._exec(cmd, onProgress, options)
+    }
+
+    async kill(pid) {
+        return this._exec(`kill -9 ${pid}`);
     }
 
     async _exec(cmd, onProgress, execOptions) {
@@ -167,10 +172,25 @@ echo -e $tmpfile-${name}
         }
  
         const self = this;
-        return new Promise(((resolve, reject) => {
+        return new Promise((async (resolve, reject) => {
+
+            const pidfile = `/tmp/${uuidv4()}`;
+            let launchScript = 
+`tmpfile="${pidfile}"
+echo $$ > $tmpfile
+${cmd}
+`;
+
+            let launchScriptPath;
+            if(execOptions.getPid) {
+                launchScriptPath = await this.writeTempFile('', launchScript);
+                await this.exec(`chmod +x ${launchScriptPath}`);
+            }
+            else
+                launchScriptPath = cmd;
 
             let options = {
-                Cmd: ['bash', '-c', cmd],
+                Cmd: ['bash', '-c', launchScriptPath],
                 // Cmd: ['bash', '-c', 'echo test $VAR'],
                 // Env: ['VAR=ttslkfjsdalkfj'],
                 AttachStdout: true,
@@ -198,29 +218,39 @@ echo -e $tmpfile-${name}
             options.WorkingDir = workingDir.replace(/\\/g, "/");
             // console.log( `updated working dir: ${workingDir}` );
 
-            let stdoutStream = new stream.PassThrough();
-            let stdout = '';
-            stdoutStream.on('data', (chunk) => {
-                let data = chunk.toString('utf8');
-                stdout += data;
-                if( onProgress ) { onProgress(data); }
-            });
-
-            let stderrStream = new stream.PassThrough();
-            let stderr = '';
-            stderrStream.on('data', (chunk) => {
-                let data = chunk.toString('utf8'); 
-                stderr += data;
-                if( onProgress ) { onProgress(data); }
-            });
-
-            container.exec(options, (err, exec) => {
+            container.exec(options, async (err, exec) => {
                 if (err) return;
-                exec.start((err, stream) => {
+                exec.start(async (err, execStream) => {
                     if (err) return;
+                    
+                    let pid;
+                    if(execOptions.getPid)
+                        pid = parseInt(await this.readFile(pidfile));
 
-                    container.modem.demuxStream(stream, stdoutStream, stderrStream);
-                    stream.on('end', async () => {
+                    let stdoutStream = new stream.PassThrough();
+                    let stdout = '';
+                    stdoutStream.on('data', (chunk) => {
+                        let data = chunk.toString('utf8');
+                        stdout += data;
+                        if (onProgress) {
+                            if (pid) onProgress({ stdout: data, pid });
+                            else onProgress(data);
+                        }
+                    });
+        
+                    let stderrStream = new stream.PassThrough();
+                    let stderr = '';
+                    stderrStream.on('data', (chunk) => {
+                        let data = chunk.toString('utf8'); 
+                        stderr += data;
+                        if (onProgress) {
+                            if (pid) onProgress({ stderr: data, pid });
+                            else onProgress(data);
+                        }
+                    });
+
+                    container.modem.demuxStream(execStream, stdoutStream, stderrStream);
+                    execStream.on('end', async () => {
                         stdoutStream.destroy();
 
                         const exitCode = (await exec.inspect()).ExitCode;
