@@ -285,18 +285,18 @@ ${content}
     checkVirt() {
         let status = null;
         if (os.platform() === 'win32') {
-            let {success,output} = _executeCommand('systeminfo');
+            let {success,output} = this._executeCommand('systeminfo');
             status = output.includes('Virtualization Enabled In Firmware: Yes');
 
         } else if (os.platform() === 'darwin') {
-            let {success,output} = _executeCommand('sysctl -a | grep machdep.cpu');
+            let {success,output} = this._executeCommand('sysctl -a | grep machdep.cpu');
             if( !success ) {
                 return false;
             }
             status = output.includes('VMX') || output.includes(".brand_string: Apple M1");
 
         } else if (os.platform() === 'linux') {
-            let {success, output} = _executeCommand("cat /proc/cpuinfo | grep -E -c 'svm|vmx'");
+            let {success, output} = this._executeCommand("cat /proc/cpuinfo | grep -E -c 'svm|vmx'");
             status = !output.includes("0");            
         }
         return status;
