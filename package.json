@@ -19,12 +19,12 @@
     "fs-extra": "^9.0.1",
     "got": "^11.5.2",
     "js-yaml": "^3.14.0",
-    "ssh2": "^0.8.7",
-    "systeminformation": "^4.27.1",
+    "ssh2": "^1.5.0",
+    "systeminformation": "^5.9.17",
     "tar": "^6.0.2",
     "uuid": "^8.3.0"
   },
   "devDependencies": {
-    "mocha": "^8.1.1"
+    "mocha": "^9.1.3"
   }
 }
