@@ -285,34 +285,33 @@ ${content}
     checkVirt() {
         let status = null;
         if (os.platform() === 'win32') {
-            let output = child_process.execSync('systeminfo');
-            if (output && output.toString().indexOf('Virtualization Enabled In Firmware: Yes') !== -1) {
-                status = true;
-            } else {
-                status = false;
-            }
+            let {success,output} = _executeCommand('systeminfo');
+            status = output.includes('Virtualization Enabled In Firmware: Yes');
+
         } else if (os.platform() === 'darwin') {
-            let output = child_process.execSync('sysctl -a | grep machdep.cpu.features');
-            if (output && output.toString().indexOf('VMX') !== -1) {
-                status = true;
-            } else {
-                status = false;
+            let {success,output} = _executeCommand('sysctl -a | grep machdep.cpu');
+            if( !success ) {
+                return false;
             }
+            status = output.includes('VMX') || output.includes(".brand_string: Apple M1");
+
         } else if (os.platform() === 'linux') {
-            let output = null;
-            try {
-                output = child_process.execSync("cat /proc/cpuinfo | grep -E -c 'svm|vmx'");
-            } catch (err) { 
-                output = err.stdout.toString();
-            }
-            
-            if (output != 0) {
-                status = true;
-            } else {
-                status = false;
-            }
+            let {success, output} = _executeCommand("cat /proc/cpuinfo | grep -E -c 'svm|vmx'");
+            status = !output.includes("0");            
         }
         return status;
+    }
+
+    _executeCommand(cmd) {
+        let output="";
+        let success = false;
+        try {
+            output = child_process.execSync(cmd);
+            success = true;
+        } catch(err) {
+            output = err;
+        }
+        return {success: success, output: output.toString()}
     }
 
     checkHyperV() {
