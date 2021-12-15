@@ -1,6 +1,6 @@
 {
   "name": "infra.connectors",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "Common library of connectors in Ottomatica tool chains, to allow communication with different infrastructure",
   "main": "index.js",
   "scripts": {
