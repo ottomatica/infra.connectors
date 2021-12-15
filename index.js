@@ -47,10 +47,13 @@ module.exports = Connector;
     // console.log(res);
 
     // let docker = new DockerConnector("foo");
-    // await docker.run("node:12-buster", "/bin/sh");
 
+    // await docker.run("node:12-buster", "/bin/sh");
     // let result = await docker.exec("npm install http-server -g");
     // console.log(result );
+
+    // let f = await docker.imageExists( "node:12-buster" );
+    // console.log( f );
     // result = await docker.spawn("http-server -p 8888");
     // console.log(result );
     // console.log( await docker.exec("wget -qO- localhost:8888") );

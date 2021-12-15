@@ -43,6 +43,24 @@ class DockerConnector extends Connector {
         });
     }
 
+    /*
+     * imageNames: string | string[] 
+     * image format <image-name>[:<tag>]
+     */    
+    async imageExists( imageNames ) {
+        return new Promise((resolve, reject) => {    
+            let imageNamesArray = Array.isArray(imageNames) ? imageNames : [imageNames];
+
+            this.docker.listImages({ filters: { reference: imageNamesArray } })
+                .then( (images) => { 
+                    console.log( images );
+                    resolve( images.length > 0 )
+                })
+                .catch( (err) => reject(err.message) )
+            ;
+        });
+    }
+
     async setup(_context, _setup) {
         // TODO:
     }
@@ -68,8 +86,9 @@ class DockerConnector extends Connector {
             OpenStdin: false,
             StdinOnce: false,
             HostConfig: {
+                ...options,
                 Memory: options.Memory || 0,
-                NanoCPUs: options.NanoCPUs || 1000000000
+                NanoCPUs: options.NanoCPUs || 1000000000                
             }
         }).then(container => container.start());
     }
