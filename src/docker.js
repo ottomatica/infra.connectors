@@ -24,6 +24,7 @@ class DockerConnector extends Connector {
             self.docker.pull(imageName, async (error, stream) => {
                 
                 if (error) { reject(error); }
+                if (!stream) { reject("Failured to pull."); }
                 
                 let onFinished = (error, output) => {
                     if (error) {
