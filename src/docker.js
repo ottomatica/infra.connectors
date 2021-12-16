@@ -99,9 +99,11 @@ class DockerConnector extends Connector {
                     NanoCPUs: options.NanoCPUs || 1000000000                
                 }
             }).then(container => {
-                container.start()
-                .then( (data) => resolve(data) )
-                .catch( (err) => reject(err) )
+                container.start( {}, (err, data) => {
+
+                    if( err ) return reject(err);
+                    resolve( data );
+                });
             })
             .catch(err => reject(err) );
 
