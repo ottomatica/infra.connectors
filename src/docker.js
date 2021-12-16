@@ -104,11 +104,12 @@ class DockerConnector extends Connector {
                 container.start( {}, (err, data) => {
                     if( err ) return reject(err);
 
-                    container.stats().then( (stats) => {
+                    container.stats({stream: false}, (statsErr, stats) => {
+                        if( statsErr ) reject(statsErr);
 
-                        console.log( stats );
-
-                    }).catch( err => reject(err))
+                        console.log(stats);
+                        resolve( stats );
+                    })
                 });
             })
             .catch(err => reject(err) );
