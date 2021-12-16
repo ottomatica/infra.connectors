@@ -81,7 +81,7 @@ class DockerConnector extends Connector {
 
         options = options || {};
 
-        await this.docker.createContainer({
+        return this.docker.createContainer({
             name: this.containerId,
             Image: image,
             AttachStdin: false,
@@ -96,7 +96,8 @@ class DockerConnector extends Connector {
                 Memory: options.Memory || 0,
                 NanoCPUs: options.NanoCPUs || 1000000000                
             }
-        }).then(container => container.start());
+        }).then(container => container.start())
+        .catch(err => err );
     }
 
     async delete() {
