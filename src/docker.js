@@ -16,12 +16,13 @@ class DockerConnector extends Connector {
         this.type = 'docker';
     }
 
-    async pull(imageName, onProgress, verbose = true) {
+    async _pull(imageName, options, onProgress, verbose = true) {
+
         let self = this;
         // console.log( `pulling ${imageName}`);
         process.stdout.write(`pulling ${imageName} `);
         return new Promise((resolve, reject) => {
-            self.docker.pull(imageName, async (error, stream) => {
+            self.docker.pull(imageName, options, async (error, stream) => {
                 
                 if (error) { return reject(error); }
                 if (!stream) { return reject("Failured to pull."); }
@@ -42,6 +43,10 @@ class DockerConnector extends Connector {
                 self.docker.modem.followProgress(stream, onFinished, onProgress);
             });
         });
+    }
+
+    async pull(imageName, onProgress, verbose = true) {
+        return this._pull(imageName, {}, onProgress, verbose);
     }
 
     /*
