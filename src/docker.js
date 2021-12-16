@@ -7,6 +7,7 @@ const fs = require('fs');
 const { v4: uuidv4 } = require('uuid');
 
 const Connector = require('./connector');
+const { resolveCaa } = require('dns');
 
 class DockerConnector extends Connector {
     constructor(container) {
@@ -100,12 +101,14 @@ class DockerConnector extends Connector {
                 }
             }).then(container => {
 
-                console.log( container );
-
                 container.start( {}, (err, data) => {
-
                     if( err ) return reject(err);
-                    resolve( data );
+
+                    container.stats().then( (stats) => {
+
+                        console.log( stats );
+
+                    }).catch( err => reject(err))
                 });
             })
             .catch(err => reject(err) );
