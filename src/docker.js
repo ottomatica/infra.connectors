@@ -96,8 +96,8 @@ class DockerConnector extends Connector {
                 Memory: options.Memory || 0,
                 NanoCPUs: options.NanoCPUs || 1000000000                
             }
-        }).then(container => container.start())
-        .catch(err => err );
+        }).then(container => Promise.resolve(container.start()))
+        .catch(err => Promise.reject(err) );
     }
 
     async delete() {
