@@ -81,23 +81,32 @@ class DockerConnector extends Connector {
 
         options = options || {};
 
-        return this.docker.createContainer({
-            name: this.containerId,
-            Image: image,
-            AttachStdin: false,
-            AttachStdout: true,
-            AttachStderr: true,
-            Tty: true,
-            Cmd: Array.isArray(cmd) ? cmd : [cmd],
-            OpenStdin: false,
-            StdinOnce: false,
-            HostConfig: {
-                ...options,
-                Memory: options.Memory || 0,
-                NanoCPUs: options.NanoCPUs || 1000000000                
-            }
-        }).then(container => Promise.resolve(container.start()))
-        .catch(err => Promise.reject(err) );
+        return new Promise( (resolve, reject) => {
+
+            this.docker.createContainer({
+                name: this.containerId,
+                Image: image,
+                AttachStdin: false,
+                AttachStdout: true,
+                AttachStderr: true,
+                Tty: true,
+                Cmd: Array.isArray(cmd) ? cmd : [cmd],
+                OpenStdin: false,
+                StdinOnce: false,
+                HostConfig: {
+                    ...options,
+                    Memory: options.Memory || 0,
+                    NanoCPUs: options.NanoCPUs || 1000000000                
+                }
+            }).then(container => {
+                container.start()
+                .then( (data) => resolve(data) )
+                .catch( (err) => reject(err) )
+            })
+            .catch(err => reject(err) );
+
+        });
+
     }
 
     async delete() {
