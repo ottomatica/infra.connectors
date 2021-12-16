@@ -103,17 +103,18 @@ class DockerConnector extends Connector {
 
                 container.start( {}, (err, data) => {
                     if( err ) return reject(err);
+                    resolve(data);
 
-
+                    // These might not be fully ready. Caller should use `ready()` to check if container is still running.
                     // container.stats({stream: false}, (statsErr, stats) => {
                     //     if( statsErr ) reject(statsErr);
                     //     if( Object.keys( pids_stats ).length == 0 || Object.keys( memory_stats).length == 0 ) {
                     //     }
-                    container.inspect( {}, (statsErr, stats) => {
-                        if( statsErr ) reject(statsErr);
-                        console.log(stats);
-                        resolve( stats );
-                    })
+                    // container.inspect( {}, (statsErr, stats) => {
+                    //     if( statsErr ) reject(statsErr);
+                    //     console.log(stats);
+                    //     resolve( stats );
+                    // })
                 });
             })
             .catch(err => reject(err) );
