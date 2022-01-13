@@ -10,9 +10,10 @@ const Connector = require('./connector');
 const { resolveCaa } = require('dns');
 
 class DockerConnector extends Connector {
-    constructor(container) {
+    constructor(container, opts) {
         super('docker@', 'privateKey@');
-        this.docker = new Docker();
+
+        this.docker = new Docker(opts);
         this.containerId = container;
         this.type = 'docker';
     }

@@ -30,7 +30,7 @@ class Connector {
                 return new SSHConnector(name, opts.privateKey);
 
             case 'docker':
-                return new DockerConnector(name);
+                return new DockerConnector(name, opts);
 
             default:
                 break;
