@@ -245,6 +245,7 @@ ${cmd}
                 // Env: ['VAR=ttslkfjsdalkfj'],
                 AttachStdout: true,
                 AttachStderr: true,
+                AttachStdin: true
             };
 
             if( execOptions.tty )
@@ -270,7 +271,7 @@ ${cmd}
 
             container.exec(options, async (err, exec) => {
                 if (err) return;
-                exec.start(async (err, execStream) => {
+                exec.start({ hijack: true, stdin: true }, async (err, execStream) => {
                     if (err) return;
                     
                     let pid;
@@ -299,11 +300,26 @@ ${cmd}
                         }
                     });
 
+                    if (execOptions.stdioStreams) {
+                        stdoutStream.pipe(execOptions.stdioStreams.stdout)
+                        stderrStream.pipe(execOptions.stdioStreams.stderr)
+                        execOptions.stdioStreams.stdin.on('data', (input) => {
+                            execStream.write(input);
+                        });
+                    }
+
                     container.modem.demuxStream(execStream, stdoutStream, stderrStream);
                     execStream.on('end', async () => {
                         stdoutStream.destroy();
 
                         const exitCode = (await exec.inspect()).ExitCode;
+
+                        if (execOptions.stdioStreams) {
+                            execOptions.stdioStreams.stderr.write(`EXITED: ${exitCode}`)
+                            execOptions.stdioStreams.stdout.destroy();
+                            execOptions.stdioStreams.stderr.destroy();
+                            execOptions.stdioStreams.stdin.destroy();
+                        }
 
                         resolve({stdout, stderr, exitCode});
                     });
