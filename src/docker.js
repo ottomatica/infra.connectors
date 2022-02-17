@@ -95,6 +95,7 @@ class DockerConnector extends Connector {
                 Cmd: Array.isArray(cmd) ? cmd : [cmd],
                 OpenStdin: false,
                 StdinOnce: false,
+                Env: options.Env,
                 HostConfig: {
                     ...options,
                     Memory: options.Memory || 0,
