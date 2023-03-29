@@ -92,7 +92,7 @@ class DockerConnector extends Connector {
                 AttachStdout: true,
                 AttachStderr: true,
                 Tty: true,
-                Cmd: Array.isArray(cmd) ? cmd : [cmd],
+                Cmd: cmd  ? (Array.isArray(cmd) ? cmd : [cmd]) : undefined,
                 OpenStdin: false,
                 StdinOnce: false,
                 Env: options.Env,
